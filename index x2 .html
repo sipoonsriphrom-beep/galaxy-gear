@@ -33,8 +33,8 @@
     <style>
         body {
             background-color: #050711;
-            background-image: linear-gradient(to bottom, rgba(5, 7, 17, 0.75), rgba(5, 7, 17, 0.88)), 
-                              url('https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExM21lcm16em51dmk5dTIxanllbGo2OGMxODhjZjE1MHVxdm9wOHFkYSZlcD12MV9naWZzX3NlYXJjaCZjdD1n/Fbox1ygIqnga5dLinz/giphy.gif');
+            background-image: linear-gradient(to bottom, rgba(5, 7, 17, 0.8), rgba(5, 7, 17, 0.92)), 
+                              url('https://images.unsplash.com/photo-1506703719100-a0f3a48c0f86?q=80&w=1920&auto=format&fit=crop');
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
@@ -48,7 +48,7 @@
         ::-webkit-scrollbar-thumb:hover { background: rgba(168, 85, 247, 0.8); }
 
         .glass-card {
-            background: rgba(15, 23, 42, 0.45);
+            background: rgba(15, 23, 42, 0.55);
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
             border: 1px solid rgba(255, 255, 255, 0.1);
@@ -58,14 +58,14 @@
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
         .glass-card-hover:hover {
-            background: rgba(30, 41, 59, 0.6);
+            background: rgba(30, 41, 59, 0.7);
             border-color: rgba(168, 85, 247, 0.5);
             transform: translateY(-4px);
             box-shadow: 0 12px 24px -6px rgba(0, 0, 0, 0.5), 0 0 20px -3px rgba(168, 85, 247, 0.3);
         }
 
         .glass-nav {
-            background: rgba(8, 12, 28, 0.75);
+            background: rgba(8, 12, 28, 0.85);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
             border-bottom: 1px solid rgba(255, 255, 255, 0.08);
@@ -109,13 +109,17 @@
                     <button id="login-btn" onclick="openAuthModal('login')" class="bg-purple-600/70 hover:bg-purple-500/90 backdrop-blur-md px-4 py-2 rounded-xl text-xs font-bold transition-all shadow-neon-purple border border-purple-400/40 active:scale-95">
                         🔑 เข้าสู่ระบบ
                     </button>
-                    <div id="user-info" class="hidden flex items-center gap-3 glass-card px-3.5 py-1.5 rounded-xl border border-purple-500/30">
+                    <div id="user-info" class="hidden flex items-center gap-2.5 glass-card px-3 py-1.5 rounded-xl border border-purple-500/30">
                         <span id="user-credit-display" class="bg-emerald-950/80 border border-emerald-500/40 text-emerald-300 px-2.5 py-1 rounded-lg text-xs font-black shadow-neon-green">
                             💳 0 ฿
                         </span>
                         <span id="user-display-name" class="font-bold text-purple-300 text-xs"></span>
-                        <button onclick="logout()" class="bg-red-500/20 hover:bg-red-500 text-red-300 hover:text-white px-2.5 py-1 rounded-lg text-xs font-semibold transition active:scale-95 border border-red-500/30">
+                        
+                        <button onclick="logout()" class="bg-gray-700/60 hover:bg-gray-600 text-gray-200 px-2.5 py-1 rounded-lg text-xs font-semibold transition active:scale-95 border border-white/10">
                             ออก
+                        </button>
+                        <button onclick="deleteSelfAccount()" title="ลบบัญชีผู้ใช้ของฉัน" class="bg-red-500/20 hover:bg-red-600/80 text-red-300 hover:text-white px-2 py-1 rounded-lg text-xs font-bold transition active:scale-95 border border-red-500/30">
+                            🗑️
                         </button>
                     </div>
                 </div>
@@ -133,7 +137,7 @@
     <main class="container mx-auto p-4 md:p-6 flex-grow max-w-7xl">
 
         <!-- Python Backend Badge Banner -->
-        <div class="glass-card p-4 rounded-2xl mb-8 border border-blue-500/30 flex flex-col md:flex-row items-center justify-between gap-4 bg-gradient-to-r from-blue-950/30 via-purple-950/30 to-slate-950/40">
+        <div class="glass-card p-4 rounded-2xl mb-8 border border-blue-500/30 flex flex-col md:flex-row items-center justify-between gap-4 bg-gradient-to-r from-blue-950/40 via-purple-950/40 to-slate-950/50">
             <div class="flex items-center gap-3">
                 <div class="w-12 h-12 rounded-xl bg-gradient-to-tr from-brand-pyblue to-brand-pyyellow p-0.5 shadow-lg flex-shrink-0 flex items-center justify-center font-bold text-slate-900 text-xl">
                     🐍
@@ -144,13 +148,13 @@
                         <span class="bg-purple-500/20 text-purple-300 text-[10px] px-2 py-0.5 rounded border border-purple-400/30 font-mono">FastAPI + SQLite</span>
                     </h2>
                     <p class="text-xs text-gray-400 mt-0.5">
-                        ทุกแอคชัน (สมัครสมาชิก, ล็อกอิน, ตะกร้าแยกผู้ใช้, ตัดเครดิต, สั่งซื้อ) ถูกประมวลผลด้วยจำลองโค้ด Python และเก็บบันทึกประวัติเวลา Timestamp อัตโนมัติ
+                        ทุกแอคชัน (สมัครสมาชิก, เครดิตเริ่มต้น 0฿, ลบผู้ใช้, ตะกร้าแยกผู้ใช้, ชำระเงิน) ประมวลผลผ่าน Python FastAPI simulator สด
                     </p>
                 </div>
             </div>
             <div class="flex items-center gap-2 w-full md:w-auto justify-end">
                 <button onclick="openPythonCodeModal()" class="w-full md:w-auto bg-blue-600/80 hover:bg-blue-500 text-white px-4 py-2 rounded-xl text-xs font-bold border border-blue-400/40 transition active:scale-95 shadow-neon-cyan flex items-center justify-center gap-1.5">
-                    <span>📄</span> ดูโค้ด Python Backend สด
+                    <span>📄</span> ดูโค้ด Python FastAPI
                 </button>
             </div>
         </div>
@@ -158,12 +162,12 @@
         <!-- Admin Control Panel -->
         <section id="admin-add-product-section" class="hidden glass-card p-6 rounded-3xl shadow-2xl border border-purple-500/30 mb-10 space-y-6">
             <h2 class="text-xl font-black text-purple-400 flex items-center gap-2 tracking-wide">
-                👑 แผงควบคุมผู้ดูแลระบบ (Admin Python Control)
+                👑 แผงควบคุมผู้ดูแลระบบ (Admin Python Control & Management)
             </h2>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <!-- 1. เติมเครดิต -->
-                <div class="bg-gray-900/50 border border-emerald-500/30 p-4 rounded-2xl">
+                <div class="bg-gray-900/60 border border-emerald-500/30 p-4 rounded-2xl">
                     <h3 class="text-xs font-bold text-emerald-400 mb-3 flex items-center gap-1.5">
                         💳 Python API: POST /api/admin/add-credit
                     </h3>
@@ -178,7 +182,7 @@
                 </div>
 
                 <!-- 2. เพิ่มสินค้าใหม่ -->
-                <div class="bg-gray-900/50 border border-purple-500/20 p-4 rounded-2xl">
+                <div class="bg-gray-900/60 border border-purple-500/20 p-4 rounded-2xl">
                     <h3 class="text-xs font-bold text-purple-300 mb-3 flex items-center gap-1.5">
                         📦 Python API: POST /api/products
                     </h3>
@@ -191,11 +195,33 @@
                             <option value="หูฟัง">หูฟัง</option>
                             <option value="แผ่นรองเมาส์">แผ่นรองเมาส์</option>
                         </select>
-                        <input type="url" id="prod-img" placeholder="URL รูปภาพ" required class="bg-gray-900/90 border border-white/10 p-2 rounded-xl text-white text-xs focus:border-purple-500 focus:outline-none">
+                        <input type="url" id="prod-img" placeholder="URL รูปภาพ (Unsplash/Direct)" required class="bg-gray-900/90 border border-white/10 p-2 rounded-xl text-white text-xs focus:border-purple-500 focus:outline-none">
                         <button type="submit" class="col-span-1 sm:col-span-2 bg-purple-600/80 hover:bg-purple-500 border border-purple-400/40 text-white font-bold p-2.5 rounded-xl transition active:scale-95 shadow-neon-purple text-xs mt-1">
                             + เพิ่มสินค้าลง SQLite
                         </button>
                     </form>
+                </div>
+            </div>
+
+            <!-- 3. จัดการบัญชีผู้ใช้ (Admin Delete/Manage Users) -->
+            <div class="bg-gray-900/60 border border-red-500/30 p-4 rounded-2xl">
+                <h3 class="text-xs font-bold text-red-400 mb-3 flex items-center gap-1.5">
+                    👥 Python API: DELETE /api/admin/users/{username} (จัดการและลบบัญชีผู้ใช้)
+                </h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-xs text-left text-gray-300">
+                        <thead class="text-[11px] uppercase bg-gray-800/80 text-gray-400 border-b border-gray-700">
+                            <tr>
+                                <th class="py-2 px-3">ชื่อผู้ใช้ (Username)</th>
+                                <th class="py-2 px-3">สิทธิ์ (Role)</th>
+                                <th class="py-2 px-3">เครดิตคงเหลือ</th>
+                                <th class="py-2 px-3 text-right">การจัดการ</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-user-list-tbody" class="divide-y divide-gray-800">
+                            <!-- Populated via JavaScript -->
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </section>
@@ -207,7 +233,7 @@
                     <h2 class="text-xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white via-gray-200 to-gray-400 tracking-wide">
                         หมวดหมู่แนะนำ
                     </h2>
-                    <p class="text-xs text-gray-400 mt-0.5">เลือกประเภทอุปกรณ์เกมมิ่งที่คุณต้องการ</p>
+                    <p class="text-xs text-gray-400 mt-0.5">เลือกประเภทอุปกรณ์เกมมิ่งไฮเอนด์ที่คุณต้องการ</p>
                 </div>
                 <button onclick="filterCategory('all')" class="text-xs font-bold glass-card hover:bg-gray-800/60 px-3.5 py-1.5 rounded-xl transition border border-white/10 text-purple-300 flex items-center gap-1">
                     ดูทั้งหมด <span>›</span>
@@ -277,7 +303,7 @@
             <!-- Register -->
             <div id="register-form-container" class="hidden">
                 <h3 class="text-2xl font-black mb-1 text-purple-400 text-center">สมัครสมาชิก</h3>
-                <p class="text-xs text-gray-400 text-center mb-5">สร้างบัญชีผู้ใช้ใหม่ใน SQLite</p>
+                <p class="text-xs text-gray-400 text-center mb-5">สร้างบัญชีผู้ใช้ใหม่ใน SQLite (เริ่มต้น 0 ฿)</p>
                 
                 <form onsubmit="handleRegister(event)" class="flex flex-col gap-3">
                     <input type="text" id="reg-username" placeholder="ชื่อผู้ใช้ (Username)" required class="bg-gray-900/80 border border-white/10 p-3 rounded-xl focus:outline-none focus:border-purple-500 text-white text-xs">
@@ -339,6 +365,16 @@
 
 app = FastAPI(title=<span class="text-yellow-300">"Galaxy Gear API"</span>)
 
+<span class="text-gray-500"># Delete user account endpoint</span>
+<span class="text-purple-400">@app.delete</span>(<span class="text-yellow-300">"/api/users/{username}"</span>)
+<span class="text-purple-400">def</span> <span class="text-blue-400">delete_user</span>(username: <span class="text-cyan-300">str</span>):
+    conn = sqlite3.connect(<span class="text-yellow-300">"galaxy_shop.db"</span>)
+    cursor = conn.cursor()
+    cursor.execute(<span class="text-yellow-300">"DELETE FROM users WHERE username = ?"</span>, (username,))
+    conn.commit()
+    conn.close()
+    <span class="text-purple-400">return</span> {<span class="text-yellow-300">"status"</span>: <span class="text-yellow-300">"deleted"</span>, <span class="text-yellow-300">"username"</span>: username}
+
 <span class="text-gray-500"># Model สำหรับรับข้อมูลชำระเงิน</span>
 <span class="text-purple-400">class</span> <span class="text-yellow-300">CheckoutRequest</span>(BaseModel):
     username: <span class="text-cyan-300">str</span>
@@ -347,12 +383,10 @@ app = FastAPI(title=<span class="text-yellow-300">"Galaxy Gear API"</span>)
 
 <span class="text-purple-400">@app.post</span>(<span class="text-yellow-300">"/api/checkout"</span>)
 <span class="text-purple-400">def</span> <span class="text-blue-400">process_checkout</span>(data: CheckoutRequest):
-    now = datetime.now()  <span class="text-gray-500"># บันทึกเวลาฝั่ง Python Backend</span>
-    
+    now = datetime.now()
     conn = sqlite3.connect(<span class="text-yellow-300">"galaxy_shop.db"</span>)
     cursor = conn.cursor()
     
-    <span class="text-gray-500"># ตรวจสอบเครดิตผู้ใช้</span>
     cursor.execute(<span class="text-yellow-300">"SELECT credit FROM users WHERE username = ?"</span>, (data.username,))
     user = cursor.fetchone()
     
@@ -360,20 +394,12 @@ app = FastAPI(title=<span class="text-yellow-300">"Galaxy Gear API"</span>)
         conn.close()
         <span class="text-purple-400">raise</span> HTTPException(status_code=<span class="text-cyan-300">400</span>, detail=<span class="text-yellow-300">"เครดิตไม่เพียงพอ"</span>)
         
-    <span class="text-gray-500"># หักเครดิต & บันทึกคำสั่งซื้อลง SQLite</span>
     new_credit = user[<span class="text-cyan-300">0</span>] - data.total_price
     cursor.execute(<span class="text-yellow-300">"UPDATE users SET credit = ? WHERE username = ?"</span>, (new_credit, data.username))
-    cursor.execute(<span class="text-yellow-300">"INSERT INTO orders (username, total, created_at) VALUES (?, ?, ?)"</span>, 
-                   (data.username, data.total_price, now.strftime(<span class="text-yellow-300">"%Y-%m-%d %H:%M:%S"</span>)))
-    
     conn.commit()
     conn.close()
-    
-    <span class="text-purple-400">return</span> {
-        <span class="text-yellow-300">"status"</span>: <span class="text-yellow-300">"success"</span>,
-        <span class="text-yellow-300">"timestamp"</span>: now.strftime(<span class="text-yellow-300">"%Y-%m-%d %H:%M:%S"</span>),
-        <span class="text-yellow-300">"remaining_credit"</span>: new_credit
-    }</pre>
+    <span class="text-purple-400">return</span> {<span class="text-yellow-300">"status"</span>: <span class="text-yellow-300">"success"</span>, <span class="text-yellow-300">"remaining_credit"</span>: new_credit}
+            </pre>
             <div class="mt-4 flex justify-end">
                 <button onclick="closePythonCodeModal()" class="bg-gray-800 hover:bg-gray-700 text-white px-4 py-2 rounded-xl text-xs font-bold">ปิดหน้าต่าง</button>
             </div>
@@ -384,24 +410,49 @@ app = FastAPI(title=<span class="text-yellow-300">"Galaxy Gear API"</span>)
     <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2"></div>
 
     <script>
-        // Data Store
+        // High quality fallbacks and Unsplash HD Gaming Products
         const products = [
-            { id: 1, name: "คีย์บอร์ดกลไก RGB", category: "คีย์บอร์ด", price: 1590, img: "https://i.ibb.co/C3bBvCL3/image-2026-09-17-213354186.png" },
-            { id: 2, name: "เมาส์ไร้สาย Gaming", category: "เมาส์", price: 890, img: "https://i.ibb.co/dTt6q6L/image-2026-09-17-213612467.png" },
-            { id: 3, name: "หูฟัง Bluetooth", category: "หูฟัง", price: 1290, img: "https://i.ibb.co/MDgj39gQ/image-2026-09-17-213720718.png" },
-            { id: 4, name: "แผ่นรองเมาส์ขนาดใหญ่", category: "แผ่นรองเมาส์", price: 290, img: "https://i.ibb.co/ZzFvKwbR/image-2026-09-17-213820146.png" }
+            { 
+                id: 1, 
+                name: "คีย์บอร์ดกลไก Custom Cyberpunk RGB", 
+                category: "คีย์บอร์ด", 
+                price: 1590, 
+                img: "https://images.unsplash.com/photo-1618384887929-16ec33fab9ef?q=80&w=800&auto=format&fit=crop" 
+            },
+            { 
+                id: 2, 
+                name: "เมาส์ไร้สาย Ultra-lightweight Gaming", 
+                category: "เมาส์", 
+                price: 890, 
+                img: "https://images.unsplash.com/photo-1615663245857-ac93bb7c39e7?q=80&w=800&auto=format&fit=crop" 
+            },
+            { 
+                id: 3, 
+                name: "หูฟัง Gaming 7.1 Spatial Audio", 
+                category: "หูฟัง", 
+                price: 1290, 
+                img: "https://images.unsplash.com/photo-1546435770-a3e426bf472b?q=80&w=800&auto=format&fit=crop" 
+            },
+            { 
+                id: 4, 
+                name: "แผ่นรองเมาส์ไฟ RGB Size XXL", 
+                category: "แผ่นรองเมาส์", 
+                price: 290, 
+                img: "https://images.unsplash.com/photo-1629429408209-1f912961dbd8?q=80&w=800&auto=format&fit=crop" 
+            }
         ];
 
         const featuredCategoriesData = [
-            { id: 'คีย์บอร์ด', title: 'คีย์บอร์ดกลไก RGB', subtitle: 'สัมผัสการกดที่แม่นยำ', banner: 'https://i.ibb.co/C3bBvCL3/image-2026-09-17-213354186.png' },
-            { id: 'เมาส์', title: 'เมาส์ไร้สาย Gaming', subtitle: 'ตอบสนองไว ไร้สายรบกวน', banner: 'https://i.ibb.co/dTt6q6L/image-2026-09-17-213612467.png' },
-            { id: 'หูฟัง', title: 'หูฟัง Bluetooth', subtitle: 'มิติเสียงสมจริงรอบทิศทาง', banner: 'https://i.ibb.co/MDgj39gQ/image-2026-09-17-213720718.png' },
-            { id: 'แผ่นรองเมาส์', title: 'แผ่นรองเมาส์ขนาดใหญ่', subtitle: 'พื้นผิวลื่นไหล ควบคุมแม่นยำ', banner: 'https://i.ibb.co/ZzFvKwbR/image-2026-09-17-213820146.png' }
+            { id: 'คีย์บอร์ด', title: 'คีย์บอร์ดกลไก RGB', subtitle: 'สัมผัสการกดที่แม่นยำ ไวต่อการตอบสนอง', banner: 'https://images.unsplash.com/photo-1587829741301-dc798b83add3?q=80&w=800&auto=format&fit=crop' },
+            { id: 'เมาส์', title: 'เมาส์ไร้สาย Gaming', subtitle: 'ตอบสนองไว เซนเซอร์ระดับ eSports', banner: 'https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?q=80&w=800&auto=format&fit=crop' },
+            { id: 'หูฟัง', title: 'หูฟัง Spatial Audio', subtitle: 'มิติเสียงสมจริงรอบทิศทาง 360°', banner: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=800&auto=format&fit=crop' },
+            { id: 'แผ่นรองเมาส์', title: 'แผ่นรองเมาส์ XXL', subtitle: 'พื้นผิวลื่นไหล ควบคุมแม่นยำ', banner: 'https://images.unsplash.com/photo-1616440342855-467268571811?q=80&w=800&auto=format&fit=crop' }
         ];
 
         let currentCategory = 'all';
         let users = JSON.parse(localStorage.getItem('users')) || [];
         
+        // Ensure admin default existence
         if (!users.find(u => u.username === 'admin')) {
             users.push({ username: 'admin', password: '1234', role: 'admin', credit: 5000 });
             localStorage.setItem('users', JSON.stringify(users));
@@ -462,8 +513,10 @@ app = FastAPI(title=<span class="text-yellow-300">"Galaxy Gear API"</span>)
             const container = document.getElementById('featured-categories');
             container.innerHTML = featuredCategoriesData.map(cat => `
                 <div class="glass-card glass-card-hover rounded-3xl p-4 flex flex-col justify-between relative overflow-hidden group">
-                    <div class="relative w-full h-28 rounded-2xl overflow-hidden mb-2 flex items-center justify-center p-2">
-                        <img src="${cat.banner}" alt="${cat.title}" class="w-full h-full object-contain filter drop-shadow-[0_8px_12px_rgba(0,0,0,0.5)] transition-transform duration-500 group-hover:scale-110">
+                    <div class="relative w-full h-32 rounded-2xl overflow-hidden mb-3 bg-gray-900/50">
+                        <img src="${cat.banner}" alt="${cat.title}" 
+                            onerror="this.onerror=null; this.src='https://placehold.co/600x400/1e293b/a855f7?text=${encodeURIComponent(cat.title)}';"
+                            class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
                     </div>
                     <div class="flex flex-col gap-2">
                         <div>
@@ -520,9 +573,11 @@ app = FastAPI(title=<span class="text-yellow-300">"Galaxy Gear API"</span>)
             grid.innerHTML = filtered.map(product => `
                 <div class="glass-card glass-card-hover rounded-3xl p-4 flex flex-col justify-between relative group">
                     <div>
-                        <div class="relative overflow-hidden rounded-2xl mb-3 flex items-center justify-center h-40 p-2">
-                            <img src="${product.img}" alt="${product.name}" class="w-full h-full object-contain filter drop-shadow-[0_8px_12px_rgba(0,0,0,0.6)] transition-transform duration-500 group-hover:scale-105">
-                            <span class="absolute top-2 left-2 bg-purple-950/80 backdrop-blur-md text-purple-300 text-[10px] font-bold px-2 py-0.5 rounded-full border border-purple-500/30">
+                        <div class="relative overflow-hidden rounded-2xl mb-3 flex items-center justify-center h-44 bg-gray-900/40">
+                            <img src="${product.img}" alt="${product.name}" 
+                                onerror="this.onerror=null; this.src='https://placehold.co/600x400/0f172a/c084fc?text=${encodeURIComponent(product.name)}';"
+                                class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
+                            <span class="absolute top-2 left-2 bg-purple-950/80 backdrop-blur-md text-purple-300 text-[10px] font-bold px-2.5 py-0.5 rounded-full border border-purple-500/30">
                                 ${product.category}
                             </span>
                         </div>
@@ -587,10 +642,11 @@ app = FastAPI(title=<span class="text-yellow-300">"Galaxy Gear API"</span>)
                 return;
             }
 
+            // Always start new users with 0 credit
             users.push({ username, password, role: 'user', credit: 0 });
             localStorage.setItem('users', JSON.stringify(users));
             pyLog('/api/register', 'POST', `User '${username}' created in SQLite DB with 0 credit`);
-            showToast("สมัครสมาชิกสำเร็จ!");
+            showToast("สมัครสมาชิกสำเร็จ! เริ่มต้นด้วย 0 เครดิต");
             switchAuthTab('login');
         }
 
@@ -626,6 +682,36 @@ app = FastAPI(title=<span class="text-yellow-300">"Galaxy Gear API"</span>)
             showToast("ออกจากระบบแล้ว");
         }
 
+        function deleteSelfAccount() {
+            if (!currentUser) return;
+            const target = currentUser.username;
+            if (confirm(`คุณต้องการลบบัญชีผู้ใช้ "${target}" ถาวรใช่หรือไม่?`)) {
+                deleteUserAccount(target, true);
+            }
+        }
+
+        function deleteUserAccount(targetUsername, isSelf = false) {
+            // Remove user from storage
+            users = users.filter(u => u.username !== targetUsername);
+            localStorage.setItem('users', JSON.stringify(users));
+            
+            // Clean up user's cart
+            localStorage.removeItem(`cart_${targetUsername}`);
+
+            pyLog(`/api/users/${targetUsername}`, 'DELETE', `User '${targetUsername}' removed from SQLite`);
+
+            if (isSelf || (currentUser && currentUser.username === targetUsername)) {
+                currentUser = null;
+                localStorage.removeItem('currentUser');
+                showToast(`ลบบัญชี ${targetUsername} เรียบร้อยแล้ว`);
+            } else {
+                showToast(`ลบบัญชี ${targetUsername} ออกจากระบบแล้ว`);
+            }
+
+            updateAuthUI();
+            updateCartUI();
+        }
+
         function getCurrentUserCredit() {
             if (!currentUser) return 0;
             const userObj = users.find(u => u.username === currentUser.username);
@@ -653,6 +739,7 @@ app = FastAPI(title=<span class="text-yellow-300">"Galaxy Gear API"</span>)
                 if (currentUser.role === 'admin') {
                     adminSection.classList.remove('hidden');
                     updateUserDropdown();
+                    renderAdminUserTable();
                 } else {
                     adminSection.classList.add('hidden');
                 }
@@ -669,6 +756,26 @@ app = FastAPI(title=<span class="text-yellow-300">"Galaxy Gear API"</span>)
                 <option value="${u.username}">
                     ${u.username} (${u.role === 'admin' ? 'Admin' : 'User'}) - ${u.credit || 0} ฿
                 </option>
+            `).join('');
+        }
+
+        function renderAdminUserTable() {
+            const tbody = document.getElementById('admin-user-list-tbody');
+            tbody.innerHTML = users.map(u => `
+                <tr class="hover:bg-gray-800/40">
+                    <td class="py-2 px-3 font-bold text-white flex items-center gap-1.5">
+                        ${u.role === 'admin' ? '👑' : '👤'} ${u.username}
+                    </td>
+                    <td class="py-2 px-3 text-gray-400">${u.role || 'user'}</td>
+                    <td class="py-2 px-3 text-emerald-400 font-bold">${(u.credit || 0).toLocaleString()} ฿</td>
+                    <td class="py-2 px-3 text-right">
+                        ${u.username === 'admin' ? '<span class="text-gray-500 text-[10px]">Protected</span>' : `
+                            <button onclick="deleteUserAccount('${u.username}')" class="bg-red-500/20 hover:bg-red-600 text-red-300 hover:text-white px-2 py-1 rounded-lg text-[11px] font-bold border border-red-500/30 transition">
+                                🗑️ ลบผู้ใช้
+                            </button>
+                        `}
+                    </td>
+                </tr>
             `).join('');
         }
 
