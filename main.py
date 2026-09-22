@@ -13,11 +13,6 @@ from datetime import datetime
 
 app = FastAPI(title="Galaxy Gear Store API")
 
-# --- FastAPI API Endpoints (สำหรับการจำลอง/ขยายระบบในอนาคต) ---
-class CheckoutData(BaseModel):
-    username: str
-    total_price: float
-
 @app.get("/api/health")
 def health_check():
     return {
@@ -26,7 +21,6 @@ def health_check():
         "server": "Python FastAPI on Render"
     }
 
-# --- Serve Single-Page Application (HTML/CSS/JS) ---
 @app.get("/", response_class=HTMLResponse)
 def serve_galaxy_gear_app():
     return """<!DOCTYPE html>
@@ -35,8 +29,9 @@ def serve_galaxy_gear_app():
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Galaxy Gear - Fullstack Web & Python Simulator</title>
-    <!-- Tailwind CSS -->
+    <!-- Tailwind CSS & FontAwesome -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <script>
         tailwind.config = {
             theme: {
@@ -72,14 +67,13 @@ def serve_galaxy_gear_app():
             background-attachment: fixed;
         }
 
-        /* Custom Scrollbar */
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.6); }
         ::-webkit-scrollbar-thumb { background: rgba(168, 85, 247, 0.5); border-radius: 10px; }
         ::-webkit-scrollbar-thumb:hover { background: rgba(168, 85, 247, 0.8); }
 
         .glass-card {
-            background: rgba(15, 23, 42, 0.45);
+            background: rgba(15, 23, 42, 0.55);
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
             border: 1px solid rgba(255, 255, 255, 0.1);
@@ -89,14 +83,14 @@ def serve_galaxy_gear_app():
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
         .glass-card-hover:hover {
-            background: rgba(30, 41, 59, 0.6);
+            background: rgba(30, 41, 59, 0.75);
             border-color: rgba(168, 85, 247, 0.5);
             transform: translateY(-4px);
             box-shadow: 0 12px 24px -6px rgba(0, 0, 0, 0.5), 0 0 20px -3px rgba(168, 85, 247, 0.3);
         }
 
         .glass-nav {
-            background: rgba(8, 12, 28, 0.75);
+            background: rgba(8, 12, 28, 0.85);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
             border-bottom: 1px solid rgba(255, 255, 255, 0.08);
@@ -130,12 +124,10 @@ def serve_galaxy_gear_app():
             </div>
             
             <div class="flex items-center gap-3">
-                <!-- Python Terminal Drawer Toggle Button -->
                 <button onclick="toggleTerminal()" class="hidden sm:flex items-center gap-2 bg-slate-900/80 hover:bg-slate-800 text-yellow-400 px-3 py-2 rounded-xl text-xs font-mono border border-yellow-500/30 shadow-lg transition active:scale-95">
                     <span>🐍</span> Python Logs
                 </button>
 
-                <!-- Auth Section -->
                 <div id="auth-section">
                     <button id="login-btn" onclick="openAuthModal('login')" class="bg-purple-600/70 hover:bg-purple-500/90 backdrop-blur-md px-4 py-2 rounded-xl text-xs font-bold transition-all shadow-neon-purple border border-purple-400/40 active:scale-95">
                         🔑 เข้าสู่ระบบ
@@ -151,7 +143,6 @@ def serve_galaxy_gear_app():
                     </div>
                 </div>
 
-                <!-- Cart Button -->
                 <button onclick="toggleCartModal()" class="glass-card hover:bg-gray-800/50 px-4 py-2 rounded-xl relative transition active:scale-95 border border-white/10 flex items-center gap-2 font-bold text-xs shadow-lg">
                     🛒 <span>ตะกร้า</span>
                     <span id="cart-count" class="bg-gradient-to-r from-purple-500 to-indigo-500 text-white text-[11px] px-2 py-0.5 rounded-full font-black shadow-neon-purple border border-white/20">0</span>
@@ -160,10 +151,8 @@ def serve_galaxy_gear_app():
         </div>
     </header>
 
-    <!-- Main Content -->
     <main class="container mx-auto p-4 md:p-6 flex-grow max-w-7xl">
 
-        <!-- Python Backend Badge Banner -->
         <div class="glass-card p-4 rounded-2xl mb-8 border border-blue-500/30 flex flex-col md:flex-row items-center justify-between gap-4 bg-gradient-to-r from-blue-950/30 via-purple-950/30 to-slate-950/40">
             <div class="flex items-center gap-3">
                 <div class="w-12 h-12 rounded-xl bg-gradient-to-tr from-brand-pyblue to-brand-pyyellow p-0.5 shadow-lg flex-shrink-0 flex items-center justify-center font-bold text-slate-900 text-xl">
@@ -186,14 +175,12 @@ def serve_galaxy_gear_app():
             </div>
         </div>
 
-        <!-- Admin Control Panel -->
         <section id="admin-add-product-section" class="hidden glass-card p-6 rounded-3xl shadow-2xl border border-purple-500/30 mb-10 space-y-6">
             <h2 class="text-xl font-black text-purple-400 flex items-center gap-2 tracking-wide">
                 👑 แผงควบคุมผู้ดูแลระบบ (Admin Python Control)
             </h2>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <!-- 1. เติมเครดิต -->
                 <div class="bg-gray-900/50 border border-emerald-500/30 p-4 rounded-2xl">
                     <h3 class="text-xs font-bold text-emerald-400 mb-3 flex items-center gap-1.5">
                         💳 Python API: POST /api/admin/add-credit
@@ -208,7 +195,6 @@ def serve_galaxy_gear_app():
                     </form>
                 </div>
 
-                <!-- 2. เพิ่มสินค้าใหม่ -->
                 <div class="bg-gray-900/50 border border-purple-500/20 p-4 rounded-2xl">
                     <h3 class="text-xs font-bold text-purple-300 mb-3 flex items-center gap-1.5">
                         📦 Python API: POST /api/products
@@ -222,7 +208,7 @@ def serve_galaxy_gear_app():
                             <option value="หูฟัง">หูฟัง</option>
                             <option value="แผ่นรองเมาส์">แผ่นรองเมาส์</option>
                         </select>
-                        <input type="url" id="prod-img" placeholder="URL รูปภาพ" required class="bg-gray-900/90 border border-white/10 p-2 rounded-xl text-white text-xs focus:border-purple-500 focus:outline-none">
+                        <input type="url" id="prod-img" placeholder="URL รูปภาพ (Optional)" class="bg-gray-900/90 border border-white/10 p-2 rounded-xl text-white text-xs focus:border-purple-500 focus:outline-none">
                         <button type="submit" class="col-span-1 sm:col-span-2 bg-purple-600/80 hover:bg-purple-500 border border-purple-400/40 text-white font-bold p-2.5 rounded-xl transition active:scale-95 shadow-neon-purple text-xs mt-1">
                             + เพิ่มสินค้าลง SQLite
                         </button>
@@ -231,7 +217,6 @@ def serve_galaxy_gear_app():
             </div>
         </section>
 
-        <!-- หมวดหมู่แนะนำ -->
         <section class="mb-10">
             <div class="flex justify-between items-center mb-5">
                 <div>
@@ -248,17 +233,14 @@ def serve_galaxy_gear_app():
             <div id="featured-categories" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5"></div>
         </section>
 
-        <!-- ตัวกรองหมวดหมู่ -->
         <section class="mb-8">
             <h2 class="text-xs font-bold uppercase tracking-wider mb-3 text-purple-300/80">ตัวกรองหมวดหมู่</h2>
             <div id="category-buttons" class="flex flex-wrap gap-2"></div>
         </section>
 
-        <!-- Grid แสดงสินค้า -->
         <div id="product-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"></div>
     </main>
 
-    <!-- Python Terminal Drawer Component -->
     <div id="terminal-drawer" class="fixed bottom-0 left-0 right-0 z-40 transform translate-y-full transition-transform duration-300 ease-in-out">
         <div class="terminal-bg border-t-2 border-yellow-500/50 shadow-2xl rounded-t-2xl p-4 text-xs font-mono text-emerald-400 max-w-7xl mx-auto border-x border-white/10">
             <div class="flex justify-between items-center pb-2 mb-2 border-b border-gray-800">
@@ -279,12 +261,10 @@ def serve_galaxy_gear_app():
         </div>
     </div>
 
-    <!-- Auth Modal (Login / Register) -->
     <div id="auth-modal" class="fixed inset-0 bg-black/70 backdrop-blur-md hidden flex justify-center items-center z-50 transition-opacity duration-300 opacity-0">
         <div class="glass-card border border-white/20 p-8 rounded-3xl w-full max-w-sm shadow-2xl relative transform scale-95 transition-transform duration-300 text-white">
             <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white font-bold text-xl transition">✕</button>
 
-            <!-- Login -->
             <div id="login-form-container">
                 <h3 class="text-2xl font-black mb-1 text-purple-400 text-center">เข้าสู่ระบบ</h3>
                 <p class="text-xs text-gray-400 text-center mb-5">ผ่าน Python Authentication Endpoint</p>
@@ -305,7 +285,6 @@ def serve_galaxy_gear_app():
                 </p>
             </div>
 
-            <!-- Register -->
             <div id="register-form-container" class="hidden">
                 <h3 class="text-2xl font-black mb-1 text-purple-400 text-center">สมัครสมาชิก</h3>
                 <p class="text-xs text-gray-400 text-center mb-5">สร้างบัญชีผู้ใช้ใหม่ใน SQLite</p>
@@ -325,7 +304,6 @@ def serve_galaxy_gear_app():
         </div>
     </div>
 
-    <!-- Modal ตะกร้าสินค้า -->
     <div id="cart-modal" class="fixed inset-0 bg-black/70 backdrop-blur-md hidden flex justify-center items-center z-50 transition-opacity duration-300 opacity-0">
         <div class="glass-card border border-white/20 p-6 rounded-3xl w-full max-w-md shadow-2xl relative transform scale-95 transition-transform duration-300 text-white">
             <div class="flex justify-between items-center mb-4 border-b border-white/10 pb-4">
@@ -353,7 +331,6 @@ def serve_galaxy_gear_app():
         </div>
     </div>
 
-    <!-- Python Code Source Modal -->
     <div id="python-code-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md hidden flex justify-center items-center z-50 p-4">
         <div class="glass-card border border-blue-500/30 p-6 rounded-3xl w-full max-w-3xl max-h-[85vh] flex flex-col shadow-2xl relative text-white">
             <div class="flex justify-between items-center mb-4 pb-2 border-b border-gray-800">
@@ -370,7 +347,6 @@ def serve_galaxy_gear_app():
 
 app = FastAPI(title=<span class="text-yellow-300">"Galaxy Gear API"</span>)
 
-<span class="text-gray-500"># Model สำหรับรับข้อมูลชำระเงิน</span>
 <span class="text-purple-400">class</span> <span class="text-yellow-300">CheckoutRequest</span>(BaseModel):
     username: <span class="text-cyan-300">str</span>
     items: <span class="text-cyan-300">list</span>
@@ -378,62 +354,45 @@ app = FastAPI(title=<span class="text-yellow-300">"Galaxy Gear API"</span>)
 
 <span class="text-purple-400">@app.post</span>(<span class="text-yellow-300">"/api/checkout"</span>)
 <span class="text-purple-400">def</span> <span class="text-blue-400">process_checkout</span>(data: CheckoutRequest):
-    now = datetime.now()  <span class="text-gray-500"># บันทึกเวลาฝั่ง Python Backend</span>
-    
+    now = datetime.now()
     conn = sqlite3.connect(<span class="text-yellow-300">"galaxy_shop.db"</span>)
     cursor = conn.cursor()
-    
-    <span class="text-gray-500"># ตรวจสอบเครดิตผู้ใช้</span>
     cursor.execute(<span class="text-yellow-300">"SELECT credit FROM users WHERE username = ?"</span>, (data.username,))
     user = cursor.fetchone()
-    
     <span class="text-purple-400">if not</span> user <span class="text-purple-400">or</span> user[<span class="text-cyan-300">0</span>] < data.total_price:
         conn.close()
         <span class="text-purple-400">raise</span> HTTPException(status_code=<span class="text-cyan-300">400</span>, detail=<span class="text-yellow-300">"เครดิตไม่เพียงพอ"</span>)
-        
-    <span class="text-gray-500"># หักเครดิต & บันทึกคำสั่งซื้อลง SQLite</span>
     new_credit = user[<span class="text-cyan-300">0</span>] - data.total_price
     cursor.execute(<span class="text-yellow-300">"UPDATE users SET credit = ? WHERE username = ?"</span>, (new_credit, data.username))
-    cursor.execute(<span class="text-yellow-300">"INSERT INTO orders (username, total, created_at) VALUES (?, ?, ?)"</span>, 
-                   (data.username, data.total_price, now.strftime(<span class="text-yellow-300">"%Y-%m-%d %H:%M:%S"</span>)))
-    
     conn.commit()
     conn.close()
-    
-    <span class="text-purple-400">return</span> {
-        <span class="text-yellow-300">"status"</span>: <span class="text-yellow-300">"success"</span>,
-        <span class="text-yellow-300">"timestamp"</span>: now.strftime(<span class="text-yellow-300">"%Y-%m-%d %H:%M:%S"</span>),
-        <span class="text-yellow-300">"remaining_credit"</span>: new_credit
-    }</pre>
+    <span class="text-purple-400">return</span> {<span class="text-yellow-300">"status"</span>: <span class="text-yellow-300">"success"</span>, <span class="text-yellow-300">"remaining_credit"</span>: new_credit}</pre>
             <div class="mt-4 flex justify-end">
                 <button onclick="closePythonCodeModal()" class="bg-gray-800 hover:bg-gray-700 text-white px-4 py-2 rounded-xl text-xs font-bold">ปิดหน้าต่าง</button>
             </div>
         </div>
     </div>
 
-    <!-- Toast Container -->
     <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2"></div>
 
     <script>
-        // Data Store Initial
         const products = [
-            { id: 1, name: "คีย์บอร์ดกลไก RGB", category: "คีย์บอร์ด", price: 1590, img: "https://i.ibb.co/C3bBvCL3/image-2026-09-17-213354186.png" },
-            { id: 2, name: "เมาส์ไร้สาย Gaming", category: "เมาส์", price: 890, img: "https://i.ibb.co/dTt6q6L/image-2026-09-17-213612467.png" },
-            { id: 3, name: "หูฟัง Bluetooth", category: "หูฟัง", price: 1290, img: "https://i.ibb.co/MDgj39gQ/image-2026-09-17-213720718.png" },
-            { id: 4, name: "แผ่นรองเมาส์ขนาดใหญ่", category: "แผ่นรองเมาส์", price: 290, img: "https://i.ibb.co/ZzFvKwbR/image-2026-09-17-213820146.png" }
+            { id: 1, name: "คีย์บอร์ดกลไก RGB Custom", category: "คีย์บอร์ด", price: 1590, icon: "fa-keyboard", color: "from-purple-600 to-indigo-600" },
+            { id: 2, name: "เมาส์ไร้สาย Gaming 26k DPI", category: "เมาส์", price: 890, icon: "fa-computer-mouse", color: "from-pink-600 to-rose-600" },
+            { id: 3, name: "หูฟัง Bluetooth Spatial", category: "หูฟัง", price: 1290, icon: "fa-headset", color: "from-cyan-600 to-blue-600" },
+            { id: 4, name: "แผ่นรองเมาส์ RGB XXL", category: "แผ่นรองเมาส์", price: 290, icon: "fa-rug", color: "from-amber-600 to-orange-600" }
         ];
 
         const featuredCategoriesData = [
-            { id: 'คีย์บอร์ด', title: 'คีย์บอร์ดกลไก RGB', subtitle: 'สัมผัสการกดที่แม่นยำ', banner: 'https://i.ibb.co/C3bBvCL3/image-2026-09-17-213354186.png' },
-            { id: 'เมาส์', title: 'เมาส์ไร้สาย Gaming', subtitle: 'ตอบสนองไว ไร้สายรบกวน', banner: 'https://i.ibb.co/dTt6q6L/image-2026-09-17-213612467.png' },
-            { id: 'หูฟัง', title: 'หูฟัง Bluetooth', subtitle: 'มิติเสียงสมจริงรอบทิศทาง', banner: 'https://i.ibb.co/MDgj39gQ/image-2026-09-17-213720718.png' },
-            { id: 'แผ่นรองเมาส์', title: 'แผ่นรองเมาส์ขนาดใหญ่', subtitle: 'พื้นผิวลื่นไหล ควบคุมแม่นยำ', banner: 'https://i.ibb.co/ZzFvKwbR/image-2026-09-17-213820146.png' }
+            { id: 'คีย์บอร์ด', title: 'คีย์บอร์ดกลไก RGB', subtitle: 'สัมผัสการกดที่แม่นยำ', icon: 'fa-keyboard', color: 'from-purple-500 to-indigo-500' },
+            { id: 'เมาส์', title: 'เมาส์ไร้สาย Gaming', subtitle: 'ตอบสนองไว ไร้สายรบกวน', icon: 'fa-computer-mouse', color: 'from-pink-500 to-rose-500' },
+            { id: 'หูฟัง', title: 'หูฟัง Bluetooth', subtitle: 'มิติเสียงสมจริงรอบทิศทาง', icon: 'fa-headset', color: 'from-cyan-500 to-blue-500' },
+            { id: 'แผ่นรองเมาส์', title: 'แผ่นรองเมาส์ขนาดใหญ่', subtitle: 'พื้นผิวลื่นไหล ควบคุมแม่นยำ', icon: 'fa-rug', color: 'from-amber-500 to-orange-500' }
         ];
 
         let currentCategory = 'all';
         let users = JSON.parse(localStorage.getItem('users')) || [];
         
-        // Setup default admin user
         if (!users.find(u => u.username === 'admin')) {
             users.push({ username: 'admin', password: '1234', role: 'admin', credit: 5000 });
             localStorage.setItem('users', JSON.stringify(users));
@@ -441,7 +400,6 @@ app = FastAPI(title=<span class="text-yellow-300">"Galaxy Gear API"</span>)
 
         let currentUser = JSON.parse(localStorage.getItem('currentUser')) || null;
 
-        // Python Terminal Logging Simulator
         function pyLog(endpoint, method, message, status = 200) {
             const now = new Date();
             const timeStr = now.toISOString().replace('T', ' ').substring(0, 19);
@@ -462,41 +420,34 @@ app = FastAPI(title=<span class="text-yellow-300">"Galaxy Gear API"</span>)
         }
 
         function toggleTerminal() {
-            const drawer = document.getElementById('terminal-drawer');
-            drawer.classList.toggle('translate-y-full');
+            document.getElementById('terminal-drawer').classList.toggle('translate-y-full');
         }
 
         function clearTerminalLogs() {
             document.getElementById('terminal-logs').innerHTML = `<div class="text-gray-500">[SYSTEM] Logs cleared.</div>`;
         }
 
-        function openPythonCodeModal() {
-            document.getElementById('python-code-modal').classList.remove('hidden');
-        }
-        function closePythonCodeModal() {
-            document.getElementById('python-code-modal').classList.add('hidden');
-        }
+        function openPythonCodeModal() { document.getElementById('python-code-modal').classList.remove('hidden'); }
+        function closePythonCodeModal() { document.getElementById('python-code-modal').classList.add('hidden'); }
 
         function getCartStorageKey() {
             return currentUser ? `cart_${currentUser.username}` : 'cart_guest';
         }
 
         function getUserCart() {
-            const key = getCartStorageKey();
-            return JSON.parse(localStorage.getItem(key)) || [];
+            return JSON.parse(localStorage.getItem(getCartStorageKey())) || [];
         }
 
         function saveUserCart(cartData) {
-            const key = getCartStorageKey();
-            localStorage.setItem(key, JSON.stringify(cartData));
+            localStorage.setItem(getCartStorageKey(), JSON.stringify(cartData));
         }
 
         function renderFeaturedCategories() {
             const container = document.getElementById('featured-categories');
             container.innerHTML = featuredCategoriesData.map(cat => `
                 <div class="glass-card glass-card-hover rounded-3xl p-4 flex flex-col justify-between relative overflow-hidden group">
-                    <div class="relative w-full h-28 rounded-2xl overflow-hidden mb-2 flex items-center justify-center p-2">
-                        <img src="${cat.banner}" alt="${cat.title}" class="w-full h-full object-contain filter drop-shadow-[0_8px_12px_rgba(0,0,0,0.5)] transition-transform duration-500 group-hover:scale-110">
+                    <div class="relative w-full h-28 rounded-2xl overflow-hidden mb-2 flex items-center justify-center p-2 bg-gradient-to-br ${cat.color} opacity-80 group-hover:opacity-100 transition">
+                        <i class="fa-solid ${cat.icon} text-5xl text-white drop-shadow-lg transform group-hover:scale-110 transition duration-300"></i>
                     </div>
                     <div class="flex flex-col gap-2">
                         <div>
@@ -541,9 +492,7 @@ app = FastAPI(title=<span class="text-yellow-300">"Galaxy Gear API"</span>)
 
         function renderProducts() {
             const grid = document.getElementById('product-grid');
-            const filtered = currentCategory === 'all' 
-                ? products 
-                : products.filter(p => p.category === currentCategory);
+            const filtered = currentCategory === 'all' ? products : products.filter(p => p.category === currentCategory);
 
             if (filtered.length === 0) {
                 grid.innerHTML = `<div class="col-span-full text-center py-12 text-gray-400 text-xs">ไม่พบสินค้าในหมวดหมู่นี้</div>`;
@@ -552,8 +501,8 @@ app = FastAPI(title=<span class="text-yellow-300">"Galaxy Gear API"</span>)
 
             grid.innerHTML = filtered.map(p => `
                 <div class="glass-card glass-card-hover rounded-3xl p-4 flex flex-col justify-between border border-white/10 relative group">
-                    <div class="w-full h-44 rounded-2xl overflow-hidden mb-3 bg-slate-900/40 flex items-center justify-center p-2 border border-white/5">
-                        <img src="${p.img}" alt="${p.name}" class="max-h-full max-w-full object-contain filter drop-shadow-[0_6px_10px_rgba(0,0,0,0.5)] transition-transform duration-300 group-hover:scale-105">
+                    <div class="w-full h-44 rounded-2xl overflow-hidden mb-3 bg-gradient-to-br ${p.color || 'from-slate-800 to-purple-950'} flex items-center justify-center p-2 border border-white/10">
+                        <i class="fa-solid ${p.icon || 'fa-box'} text-6xl text-white/90 drop-shadow-[0_10px_10px_rgba(0,0,0,0.5)] transform group-hover:scale-110 transition duration-300"></i>
                     </div>
                     <div>
                         <span class="text-[10px] font-mono bg-purple-950/80 text-purple-300 px-2.5 py-0.5 rounded-full border border-purple-500/30">${p.category}</span>
@@ -617,9 +566,7 @@ app = FastAPI(title=<span class="text-yellow-300">"Galaxy Gear API"</span>)
             const container = document.getElementById('cart-items');
             const ownerLabel = document.getElementById('cart-owner-label');
 
-            ownerLabel.innerText = currentUser 
-                ? `OWNER: ${currentUser.username} (USER CART)` 
-                : 'OWNER: GUEST (SESSION CART)';
+            ownerLabel.innerText = currentUser ? `OWNER: ${currentUser.username}` : 'OWNER: GUEST';
 
             if (cart.length === 0) {
                 container.innerHTML = `<p class="text-center text-gray-400 py-8 text-xs">ไม่มีสินค้าในตะกร้า</p>`;
@@ -635,7 +582,9 @@ app = FastAPI(title=<span class="text-yellow-300">"Galaxy Gear API"</span>)
                 return `
                     <div class="py-3 flex justify-between items-center gap-3">
                         <div class="flex items-center gap-3">
-                            <img src="${item.img}" class="w-10 h-10 object-contain bg-slate-900 rounded-lg p-1 border border-white/10">
+                            <div class="w-10 h-10 bg-purple-900/50 rounded-lg flex items-center justify-center border border-white/10">
+                                <i class="fa-solid ${item.icon || 'fa-box'} text-purple-300"></i>
+                            </div>
                             <div>
                                 <h4 class="font-bold text-xs text-white">${item.name}</h4>
                                 <p class="text-[11px] text-gray-400">${item.price.toLocaleString()} ฿ x ${item.quantity}</p>
@@ -665,8 +614,7 @@ app = FastAPI(title=<span class="text-yellow-300">"Galaxy Gear API"</span>)
         }
 
         function removeFromCart(productId) {
-            let cart = getUserCart();
-            cart = cart.filter(item => item.id !== productId);
+            let cart = getUserCart().filter(item => item.id !== productId);
             saveUserCart(cart);
             renderCartItems();
             updateCartCount();
@@ -682,20 +630,16 @@ app = FastAPI(title=<span class="text-yellow-300">"Galaxy Gear API"</span>)
             }
 
             const cart = getUserCart();
-            if (cart.length === 0) {
-                showToast('ตะกร้าสินค้าว่างเปล่า!', 'error');
-                return;
-            }
+            if (cart.length === 0) return showToast('ตะกร้าสินค้าว่างเปล่า!', 'error');
 
             const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
 
             if (currentUser.credit < total) {
                 showToast('เครดิตไม่เพียงพอ! กรุณาติดต่อ Admin เพื่อเติมเครดิต', 'error');
-                pyLog('/api/checkout', 'POST', `Checkout Rejected for '${currentUser.username}': Insufficient Credit`, 400);
+                pyLog('/api/checkout', 'POST', `Checkout Rejected: Insufficient Credit`, 400);
                 return;
             }
 
-            // Deduct credit
             currentUser.credit -= total;
             const userIndex = users.findIndex(u => u.username === currentUser.username);
             if (userIndex !== -1) {
@@ -704,19 +648,17 @@ app = FastAPI(title=<span class="text-yellow-300">"Galaxy Gear API"</span>)
             }
             localStorage.setItem('currentUser', JSON.stringify(currentUser));
 
-            // Clear Cart
             saveUserCart([]);
             updateCartCount();
             renderCartItems();
             updateAuthUI();
 
             showToast(`ชำระเงินสำเร็จ ${total.toLocaleString()} ฿! หักเครดิตเรียบร้อย`, 'success');
-            pyLog('/api/checkout', 'POST', `Checkout Success for '${currentUser.username}'. Deducted ${total} credits. DB Updated.`, 200);
+            pyLog('/api/checkout', 'POST', `Checkout Success for '${currentUser.username}'. Deducted ${total} credits.`, 200);
             
             setTimeout(() => toggleCartModal(), 1000);
         }
 
-        // Auth Logic
         function openAuthModal(tab = 'login') {
             const modal = document.getElementById('auth-modal');
             switchAuthTab(tab);
@@ -748,7 +690,6 @@ app = FastAPI(title=<span class="text-yellow-300">"Galaxy Gear API"</span>)
             e.preventDefault();
             const u = document.getElementById('login-username').value.trim();
             const p = document.getElementById('login-password').value.trim();
-
             const user = users.find(x => x.username === u && x.password === p);
 
             if (user) {
@@ -848,9 +789,17 @@ app = FastAPI(title=<span class="text-yellow-300">"Galaxy Gear API"</span>)
             const name = document.getElementById('prod-name').value;
             const price = parseFloat(document.getElementById('prod-price').value);
             const category = document.getElementById('prod-category').value;
-            const img = document.getElementById('prod-img').value;
 
-            const newProd = { id: Date.now(), name, price, category, img };
+            const iconMap = { 'คีย์บอร์ด': 'fa-keyboard', 'เมาส์': 'fa-computer-mouse', 'หูฟัง': 'fa-headset', 'แผ่นรองเมาส์': 'fa-rug' };
+
+            const newProd = { 
+                id: Date.now(), 
+                name, 
+                price, 
+                category, 
+                icon: iconMap[category] || 'fa-box',
+                color: 'from-purple-900 to-indigo-950'
+            };
             products.push(newProd);
 
             renderCategoryButtons();
@@ -876,7 +825,6 @@ app = FastAPI(title=<span class="text-yellow-300">"Galaxy Gear API"</span>)
             setTimeout(() => toast.remove(), 3000);
         }
 
-        // Init App On Load
         window.onload = () => {
             renderFeaturedCategories();
             renderCategoryButtons();
