@@ -715,12 +715,13 @@ app = FastAPI(title=<span class="text-yellow-300">"Galaxy Gear API"</span>)
             if (p !== cp) return showToast('รหัสผ่านไม่ตรงกัน', 'error');
             if (users.find(x => x.username === u)) return showToast('มีชื่อผู้ใช้นี้อยู่แล้ว', 'error');
 
-            const newUser = { username: u, password: p, role: 'user', credit: 1000 };
+            // ✅ ตั้งค่าให้ผู้สมัครใหม่มี 0 เครดิต
+            const newUser = { username: u, password: p, role: 'user', credit: 0 };
             users.push(newUser);
             localStorage.setItem('users', JSON.stringify(users));
 
-            showToast('สมัครสมาชิกสำเร็จ! ได้รับเครดิตฟรี 1,000 ฿', 'success');
-            pyLog('/api/register', 'POST', `Registered new user '${u}' into SQLite DB`);
+            showToast('สมัครสมาชิกสำเร็จ! กรุณาติดต่อ Admin เพื่อเติมเครดิต', 'success');
+            pyLog('/api/register', 'POST', `Registered new user '${u}' with 0 credit into SQLite DB`);
             switchAuthTab('login');
         }
 
