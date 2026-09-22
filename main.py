@@ -28,7 +28,7 @@ def serve_galaxy_gear_app():
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Galaxy Gear - Fullstack Web & Vinyl CD Music Player</title>
+    <title>Galaxy Gear - Fullstack Web & Music Player</title>
     <!-- Tailwind CSS & FontAwesome -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
@@ -47,7 +47,7 @@ def serve_galaxy_gear_app():
                         }
                     },
                     boxShadow: {
-                        'neon-purple': '0 0 20px -3px rgba(168, 85, 247, 0.4)',
+                        'neon-purple': '0 0 20px -3px rgba(168, 85, 247, 0.5)',
                         'neon-orange': '0 0 20px -3px rgba(249, 115, 22, 0.4)',
                         'neon-green': '0 0 20px -3px rgba(34, 197, 94, 0.4)',
                         'neon-cyan': '0 0 20px -3px rgba(6, 182, 212, 0.4)',
@@ -257,45 +257,45 @@ def serve_galaxy_gear_app():
         <div id="product-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"></div>
     </main>
 
-    <!-- Floating Spinning CD Record Music Player -->
-    <div class="fixed bottom-0 left-0 right-0 z-50 glass-nav border-t border-purple-500/40 p-2.5 px-6 flex items-center justify-between shadow-2xl">
+    <!-- Floating Spinning CD Record Music Player (Updated Ultra-Stylish UI) -->
+    <div class="fixed bottom-0 left-0 right-0 z-50 glass-nav border-t border-purple-500/40 p-3 px-6 flex items-center justify-between shadow-2xl">
         <div class="flex items-center gap-4">
             <!-- CD Disc Record with Cover Art -->
             <div onclick="toggleMusic()" class="relative w-12 h-12 rounded-full cursor-pointer group flex-shrink-0">
                 <div id="cd-disc" class="w-full h-full rounded-full border-2 border-purple-400/60 overflow-hidden shadow-neon-purple p-0.5 bg-black relative animate-spin-cd">
                     <img src="https://img.youtube.com/vi/pP-0CzmxLE4/hqdefault.jpg" class="w-full h-full object-cover rounded-full">
-                    <!-- Inner Vinyl Hole -->
                     <div class="absolute inset-0 m-auto w-3.5 h-3.5 rounded-full bg-slate-950 border border-purple-400/80 shadow-inner flex items-center justify-center">
                         <div class="w-1.5 h-1.5 rounded-full bg-slate-900"></div>
                     </div>
                 </div>
-                <!-- Play/Pause Overlay Icon -->
-                <div class="absolute inset-0 bg-black/40 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition">
+                <div class="absolute inset-0 bg-black/50 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition">
                     <i id="cd-hover-icon" class="fa-solid fa-pause text-white text-xs"></i>
                 </div>
             </div>
 
             <div>
                 <div class="flex items-center gap-2">
-                    <span class="text-xs font-bold text-purple-300">Real J - “ ศีลแตก ” (Feat. FLAMELIGHT & XANICBOY$ )</span>
+                    <span class="text-xs font-bold text-purple-200">Real J - “ ศีลแตก ” (Feat. FLAMELIGHT & XANICBOY$ )</span>
                     <span class="text-[9px] bg-purple-950/80 text-purple-300 px-2 py-0.5 rounded-full border border-purple-500/30 font-mono">🔊 Vol: 15%</span>
                 </div>
-                <p id="music-status" class="text-[10px] text-emerald-400 font-mono">💿 CD Spinning & Playing...</p>
+                <p id="music-status" class="text-[10px] text-emerald-400 font-mono mt-0.5">💿 CD Spinning & Playing...</p>
             </div>
         </div>
 
+        <!-- Stylish Neon Controls (Right Side) -->
         <div class="flex items-center gap-3">
-            <button id="music-play-btn" onclick="toggleMusic()" class="bg-purple-600/80 hover:bg-purple-500 text-white px-3.5 py-1.5 rounded-xl text-xs font-bold border border-purple-400/40 transition active:scale-95 shadow-neon-purple flex items-center gap-1.5">
-                <i id="music-icon" class="fa-solid fa-pause"></i>
-                <span id="music-btn-text">พักเพลง</span>
+            <button id="music-play-btn" onclick="toggleMusic()" class="bg-gradient-to-r from-purple-600 via-fuchsia-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white px-4 py-2 rounded-2xl text-xs font-extrabold border border-purple-300/30 transition-all active:scale-95 shadow-neon-purple flex items-center gap-2">
+                <i id="music-icon" class="fa-solid fa-pause text-xs"></i>
+                <span id="music-btn-text" class="tracking-wide">พักเพลง</span>
             </button>
-            <a href="https://www.youtube.com/watch?v=pP-0CzmxLE4" target="_blank" class="hidden sm:flex text-xs text-purple-400 hover:text-purple-300 items-center gap-1 underline">
-                <i class="fa-brands fa-youtube text-red-500"></i> YouTube
+            <a href="https://www.youtube.com/watch?v=pP-0CzmxLE4" target="_blank" class="glass-card hover:bg-red-950/40 text-red-400 hover:text-red-300 px-3.5 py-2 rounded-2xl text-xs font-bold border border-red-500/30 transition flex items-center gap-2 shadow-lg">
+                <i class="fa-brands fa-youtube text-red-500 text-sm"></i>
+                <span class="hidden sm:inline">YouTube</span>
             </a>
         </div>
     </div>
 
-    <!-- Hidden YouTube API IFrame Player (Configured for Autoplay & Low Volume) -->
+    <!-- Hidden YouTube API Player -->
     <div id="player-container" class="hidden"></div>
     <script src="https://www.youtube.com/iframe_api"></script>
 
@@ -483,18 +483,18 @@ app = FastAPI(title=<span class="text-yellow-300">"Galaxy Gear API"</span>)
 
             if (playing) {
                 cd.classList.remove('paused-spin');
-                icon.className = 'fa-solid fa-pause';
+                icon.className = 'fa-solid fa-pause text-xs';
                 hoverIcon.className = 'fa-solid fa-pause text-white text-xs';
                 btnText.innerText = 'พักเพลง';
                 status.innerText = '💿 CD Spinning & Playing...';
-                status.className = 'text-[10px] text-emerald-400 font-mono';
+                status.className = 'text-[10px] text-emerald-400 font-mono mt-0.5';
             } else {
                 cd.classList.add('paused-spin');
-                icon.className = 'fa-solid fa-play';
+                icon.className = 'fa-solid fa-play text-xs';
                 hoverIcon.className = 'fa-solid fa-play text-white text-xs';
                 btnText.innerText = 'เล่นเพลง';
                 status.innerText = '⏸️ CD Paused';
-                status.className = 'text-[10px] text-yellow-400 font-mono';
+                status.className = 'text-[10px] text-yellow-400 font-mono mt-0.5';
             }
         }
 
