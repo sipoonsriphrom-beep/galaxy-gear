@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="th" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Galaxy Gear - Fullstack Web & Python Simulator</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            purple: '#a855f7',
+                            glow: '#c084fc',
+                            orange: '#f97316',
+                            cyan: '#06b6d4',
+                            pyyellow: '#ffde57',
+                            pyblue: '#4584b6'
+                        }
+                    },
+                    boxShadow: {
+                        'neon-purple': '0 0 20px -3px rgba(168, 85, 247, 0.4)',
+                        'neon-orange': '0 0 20px -3px rgba(249, 115, 22, 0.4)',
+                        'neon-green': '0 0 20px -3px rgba(34, 197, 94, 0.4)',
+                        'neon-cyan': '0 0 20px -3px rgba(6, 182, 212, 0.4)',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #050711;
+            background-image: linear-gradient(to bottom, rgba(5, 7, 17, 0.75), rgba(5, 7, 17, 0.88)), 
+                              url('https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExM21lcm16em51dmk5dTIxanllbGo2OGMxODhjZjE1MHVxdm9wOHFkYSZlcD12MV9naWZzX3NlYXJjaCZjdD1n/Fbox1ygIqnga5dLinz/giphy.gif');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.6); }
+        ::-webkit-scrollbar-thumb { background: rgba(168, 85, 247, 0.5); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(168, 85, 247, 0.8); }
+
+        .glass-card {
+            background: rgba(15, 23, 42, 0.45);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .glass-card-hover {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .glass-card-hover:hover {
+            background: rgba(30, 41, 59, 0.6);
+            border-color: rgba(168, 85, 247, 0.5);
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px -6px rgba(0, 0, 0, 0.5), 0 0 20px -3px rgba(168, 85, 247, 0.3);
+        }
+
+        .glass-nav {
+            background: rgba(8, 12, 28, 0.75);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .terminal-bg {
+            background-color: #0d1117;
+            font-family: 'Courier New', Courier, monospace;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .animate-toast { animation: slideIn 0.3s ease-out forwards; }
+    </style>
+</head>
+<body class="font-sans text-gray-100 antialiased min-h-screen flex flex-col relative selection:bg-purple-500 selection:text-white">
+
+    <!-- Header / Navbar -->
+    <header class="glass-nav text-white p-4 sticky top-0 z-30 shadow-2xl">
+        <div class="container mx-auto flex justify-between items-center max-w-7xl">
+            <div class="flex items-center gap-3">
+                <h1 class="text-2xl font-black tracking-wider cursor-pointer bg-gradient-to-r from-purple-400 via-fuchsia-300 to-indigo-400 bg-clip-text text-transparent hover:opacity-90 transition flex items-center gap-2" onclick="filterCategory('all')">
+                    <span class="text-2xl filter drop-shadow-[0_0_8px_rgba(168,85,247,0.8)]">⚡</span> GALAXY GEAR
+                </h1>
+                <span class="hidden md:inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-mono bg-blue-950/80 border border-blue-500/40 text-blue-300">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                    Python 3.11 + FastAPI Server Active
+                </span>
+            </div>
+            
+            <div class="flex items-center gap-3">
+                <!-- Python Terminal Drawer Toggle Button -->
+                <button onclick="toggleTerminal()" class="hidden sm:flex items-center gap-2 bg-slate-900/80 hover:bg-slate-800 text-yellow-400 px-3 py-2 rounded-xl text-xs font-mono border border-yellow-500/30 shadow-lg transition active:scale-95">
+                    <span>🐍</span> Python Logs
+                </button>
+
+                <!-- Auth Section -->
+                <div id="auth-section">
+                    <button id="login-btn" onclick="openAuthModal('login')" class="bg-purple-600/70 hover:bg-purple-500/90 backdrop-blur-md px-4 py-2 rounded-xl text-xs font-bold transition-all shadow-neon-purple border border-purple-400/40 active:scale-95">
+                        🔑 เข้าสู่ระบบ
+                    </button>
+                    <div id="user-info" class="hidden flex items-center gap-3 glass-card px-3.5 py-1.5 rounded-xl border border-purple-500/30">
+                        <span id="user-credit-display" class="bg-emerald-950/80 border border-emerald-500/40 text-emerald-300 px-2.5 py-1 rounded-lg text-xs font-black shadow-neon-green">
+                            💳 0 ฿
+                        </span>
+                        <span id="user-display-name" class="font-bold text-purple-300 text-xs"></span>
+                        <button onclick="logout()" class="bg-red-500/20 hover:bg-red-500 text-red-300 hover:text-white px-2.5 py-1 rounded-lg text-xs font-semibold transition active:scale-95 border border-red-500/30">
+                            ออก
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Cart Button -->
+                <button onclick="toggleCartModal()" class="glass-card hover:bg-gray-800/50 px-4 py-2 rounded-xl relative transition active:scale-95 border border-white/10 flex items-center gap-2 font-bold text-xs shadow-lg">
+                    🛒 <span>ตะกร้า</span>
+                    <span id="cart-count" class="bg-gradient-to-r from-purple-500 to-indigo-500 text-white text-[11px] px-2 py-0.5 rounded-full font-black shadow-neon-purple border border-white/20">0</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto p-4 md:p-6 flex-grow max-w-7xl">
+
+        <!-- Python Backend Badge Banner -->
+        <div class="glass-card p-4 rounded-2xl mb-8 border border-blue-500/30 flex flex-col md:flex-row items-center justify-between gap-4 bg-gradient-to-r from-blue-950/30 via-purple-950/30 to-slate-950/40">
+            <div class="flex items-center gap-3">
+                <div class="w-12 h-12 rounded-xl bg-gradient-to-tr from-brand-pyblue to-brand-pyyellow p-0.5 shadow-lg flex-shrink-0 flex items-center justify-center font-bold text-slate-900 text-xl">
+                    🐍
+                </div>
+                <div>
+                    <h2 class="text-sm font-bold text-blue-200 flex items-center gap-2">
+                        Python Backend Simulation Engine Activated
+                        <span class="bg-purple-500/20 text-purple-300 text-[10px] px-2 py-0.5 rounded border border-purple-400/30 font-mono">FastAPI + SQLite</span>
+                    </h2>
+                    <p class="text-xs text-gray-400 mt-0.5">
+                        ทุกแอคชัน (สมัครสมาชิก, ล็อกอิน, ตะกร้าแยกผู้ใช้, ตัดเครดิต, สั่งซื้อ) ถูกประมวลผลด้วยจำลองโค้ด Python และเก็บบันทึกประวัติเวลา Timestamp อัตโนมัติ
+                    </p>
+                </div>
+            </div>
+            <div class="flex items-center gap-2 w-full md:w-auto justify-end">
+                <button onclick="openPythonCodeModal()" class="w-full md:w-auto bg-blue-600/80 hover:bg-blue-500 text-white px-4 py-2 rounded-xl text-xs font-bold border border-blue-400/40 transition active:scale-95 shadow-neon-cyan flex items-center justify-center gap-1.5">
+                    <span>📄</span> ดูโค้ด Python Backend สด
+                </button>
+            </div>
+        </div>
+
+        <!-- Admin Control Panel -->
+        <section id="admin-add-product-section" class="hidden glass-card p-6 rounded-3xl shadow-2xl border border-purple-500/30 mb-10 space-y-6">
+            <h2 class="text-xl font-black text-purple-400 flex items-center gap-2 tracking-wide">
+                👑 แผงควบคุมผู้ดูแลระบบ (Admin Python Control)
+            </h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- 1. เติมเครดิต -->
+                <div class="bg-gray-900/50 border border-emerald-500/30 p-4 rounded-2xl">
+                    <h3 class="text-xs font-bold text-emerald-400 mb-3 flex items-center gap-1.5">
+                        💳 Python API: POST /api/admin/add-credit
+                    </h3>
+                    <form id="add-credit-form" onsubmit="handleCreditSubmit(event)" class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                        <select id="credit-target-user" class="bg-gray-900/90 border border-white/10 p-2.5 rounded-xl text-white text-xs focus:border-emerald-500 focus:outline-none">
+                        </select>
+                        <input type="number" id="credit-amount" placeholder="จำนวนเงิน (฿)" min="1" required class="bg-gray-900/90 border border-white/10 p-2.5 rounded-xl text-white placeholder-gray-500 text-xs focus:border-emerald-500 focus:outline-none">
+                        <button type="submit" class="bg-emerald-600/80 hover:bg-emerald-500 border border-emerald-400/40 text-white font-bold p-2.5 rounded-xl transition active:scale-95 shadow-neon-green text-xs">
+                            + เติมเครดิต
+                        </button>
+                    </form>
+                </div>
+
+                <!-- 2. เพิ่มสินค้าใหม่ -->
+                <div class="bg-gray-900/50 border border-purple-500/20 p-4 rounded-2xl">
+                    <h3 class="text-xs font-bold text-purple-300 mb-3 flex items-center gap-1.5">
+                        📦 Python API: POST /api/products
+                    </h3>
+                    <form id="add-product-form" onsubmit="handleFormSubmit(event)" class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        <input type="text" id="prod-name" placeholder="ชื่อสินค้า" required class="bg-gray-900/90 border border-white/10 p-2 rounded-xl text-white text-xs focus:border-purple-500 focus:outline-none">
+                        <input type="number" id="prod-price" placeholder="ราคา (เครดิต)" required class="bg-gray-900/90 border border-white/10 p-2 rounded-xl text-white text-xs focus:border-purple-500 focus:outline-none">
+                        <select id="prod-category" class="bg-gray-900/90 border border-white/10 p-2 rounded-xl text-white text-xs focus:border-purple-500 focus:outline-none">
+                            <option value="คีย์บอร์ด">คีย์บอร์ด</option>
+                            <option value="เมาส์">เมาส์</option>
+                            <option value="หูฟัง">หูฟัง</option>
+                            <option value="แผ่นรองเมาส์">แผ่นรองเมาส์</option>
+                        </select>
+                        <input type="url" id="prod-img" placeholder="URL รูปภาพ" required class="bg-gray-900/90 border border-white/10 p-2 rounded-xl text-white text-xs focus:border-purple-500 focus:outline-none">
+                        <button type="submit" class="col-span-1 sm:col-span-2 bg-purple-600/80 hover:bg-purple-500 border border-purple-400/40 text-white font-bold p-2.5 rounded-xl transition active:scale-95 shadow-neon-purple text-xs mt-1">
+                            + เพิ่มสินค้าลง SQLite
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <!-- หมวดหมู่แนะนำ -->
+        <section class="mb-10">
+            <div class="flex justify-between items-center mb-5">
+                <div>
+                    <h2 class="text-xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white via-gray-200 to-gray-400 tracking-wide">
+                        หมวดหมู่แนะนำ
+                    </h2>
+                    <p class="text-xs text-gray-400 mt-0.5">เลือกประเภทอุปกรณ์เกมมิ่งที่คุณต้องการ</p>
+                </div>
+                <button onclick="filterCategory('all')" class="text-xs font-bold glass-card hover:bg-gray-800/60 px-3.5 py-1.5 rounded-xl transition border border-white/10 text-purple-300 flex items-center gap-1">
+                    ดูทั้งหมด <span>›</span>
+                </button>
+            </div>
+
+            <div id="featured-categories" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5"></div>
+        </section>
+
+        <!-- ตัวกรองหมวดหมู่ -->
+        <section class="mb-8">
+            <h2 class="text-xs font-bold uppercase tracking-wider mb-3 text-purple-300/80">ตัวกรองหมวดหมู่</h2>
+            <div id="category-buttons" class="flex flex-wrap gap-2"></div>
+        </section>
+
+        <!-- Grid แสดงสินค้า -->
+        <div id="product-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"></div>
+    </main>
+
+    <!-- Python Terminal Drawer Component -->
+    <div id="terminal-drawer" class="fixed bottom-0 left-0 right-0 z-40 transform translate-y-full transition-transform duration-300 ease-in-out">
+        <div class="terminal-bg border-t-2 border-yellow-500/50 shadow-2xl rounded-t-2xl p-4 text-xs font-mono text-emerald-400 max-w-7xl mx-auto border-x border-white/10">
+            <div class="flex justify-between items-center pb-2 mb-2 border-b border-gray-800">
+                <div class="flex items-center gap-2">
+                    <span class="w-3 h-3 rounded-full bg-red-500 inline-block cursor-pointer" onclick="toggleTerminal()"></span>
+                    <span class="w-3 h-3 rounded-full bg-yellow-500 inline-block"></span>
+                    <span class="w-3 h-3 rounded-full bg-green-500 inline-block"></span>
+                    <span class="ml-2 font-bold text-gray-300">🐍 Python FastAPI Live Console & SQLite Logs</span>
+                </div>
+                <div class="flex items-center gap-3">
+                    <button onclick="clearTerminalLogs()" class="text-gray-400 hover:text-white text-[11px] underline">Clear Logs</button>
+                    <button onclick="toggleTerminal()" class="text-gray-400 hover:text-white font-bold">✕</button>
+                </div>
+            </div>
+            <div id="terminal-logs" class="h-44 overflow-y-auto space-y-1 pr-2 text-[11px] leading-relaxed text-gray-300">
+                <div class="text-gray-500">[SYSTEM INIT] FastAPI Application initialized with SQLite Database.</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Auth Modal (Login / Register) -->
+    <div id="auth-modal" class="fixed inset-0 bg-black/70 backdrop-blur-md hidden flex justify-center items-center z-50 transition-opacity duration-300 opacity-0">
+        <div class="glass-card border border-white/20 p-8 rounded-3xl w-full max-w-sm shadow-2xl relative transform scale-95 transition-transform duration-300 text-white">
+            <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white font-bold text-xl transition">✕</button>
+
+            <!-- Login -->
+            <div id="login-form-container">
+                <h3 class="text-2xl font-black mb-1 text-purple-400 text-center">เข้าสู่ระบบ</h3>
+                <p class="text-xs text-gray-400 text-center mb-5">ผ่าน Python Authentication Endpoint</p>
+                
+                <form onsubmit="handleLogin(event)" class="flex flex-col gap-3">
+                    <input type="text" id="login-username" placeholder="ชื่อผู้ใช้ (Username)" required class="bg-gray-900/80 border border-white/10 p-3 rounded-xl focus:outline-none focus:border-purple-500 text-white text-xs">
+                    <input type="password" id="login-password" placeholder="รหัสผ่าน (Password)" required class="bg-gray-900/80 border border-white/10 p-3 rounded-xl focus:outline-none focus:border-purple-500 text-white text-xs">
+                    <button type="submit" class="bg-purple-600 hover:bg-purple-500 border border-purple-400/40 text-white font-bold py-3 rounded-xl transition active:scale-95 shadow-neon-purple mt-1 text-xs">
+                        🐍 POST /api/login
+                    </button>
+                </form>
+                
+                <div class="p-3 bg-purple-950/40 border border-purple-500/20 rounded-xl mt-4 text-[11px] text-gray-300">
+                    💡 <span class="font-bold text-purple-400">Admin Account:</span> User: <code class="text-yellow-300 font-bold">admin</code> | Pass: <code class="text-yellow-300 font-bold">1234</code>
+                </div>
+                <p class="text-xs text-center text-gray-400 mt-4">
+                    ยังไม่มีบัญชี? <a href="#" onclick="switchAuthTab('register')" class="text-purple-400 font-bold hover:underline">สมัครสมาชิก</a>
+                </p>
+            </div>
+
+            <!-- Register -->
+            <div id="register-form-container" class="hidden">
+                <h3 class="text-2xl font-black mb-1 text-purple-400 text-center">สมัครสมาชิก</h3>
+                <p class="text-xs text-gray-400 text-center mb-5">สร้างบัญชีผู้ใช้ใหม่ใน SQLite</p>
+                
+                <form onsubmit="handleRegister(event)" class="flex flex-col gap-3">
+                    <input type="text" id="reg-username" placeholder="ชื่อผู้ใช้ (Username)" required class="bg-gray-900/80 border border-white/10 p-3 rounded-xl focus:outline-none focus:border-purple-500 text-white text-xs">
+                    <input type="password" id="reg-password" placeholder="รหัสผ่าน (Password)" required class="bg-gray-900/80 border border-white/10 p-3 rounded-xl focus:outline-none focus:border-purple-500 text-white text-xs">
+                    <input type="password" id="reg-confirm-password" placeholder="ยืนยันรหัสผ่าน" required class="bg-gray-900/80 border border-white/10 p-3 rounded-xl focus:outline-none focus:border-purple-500 text-white text-xs">
+                    <button type="submit" class="bg-purple-600 hover:bg-purple-500 border border-purple-400/40 text-white font-bold py-3 rounded-xl transition active:scale-95 shadow-neon-purple mt-1 text-xs">
+                        🐍 POST /api/register
+                    </button>
+                </form>
+                <p class="text-xs text-center text-gray-400 mt-4">
+                    มีบัญชีอยู่แล้ว? <a href="#" onclick="switchAuthTab('login')" class="text-purple-400 font-bold hover:underline">เข้าสู่ระบบ</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal ตะกร้าสินค้า -->
+    <div id="cart-modal" class="fixed inset-0 bg-black/70 backdrop-blur-md hidden flex justify-center items-center z-50 transition-opacity duration-300 opacity-0">
+        <div class="glass-card border border-white/20 p-6 rounded-3xl w-full max-w-md shadow-2xl relative transform scale-95 transition-transform duration-300 text-white">
+            <div class="flex justify-between items-center mb-4 border-b border-white/10 pb-4">
+                <div>
+                    <h3 class="text-lg font-bold text-gray-100 flex items-center gap-2">🛒 ตะกร้าสินค้าของคุณ</h3>
+                    <p id="cart-owner-label" class="text-xs text-purple-300 mt-0.5 font-mono"></p>
+                </div>
+                <button onclick="toggleCartModal()" class="text-gray-400 hover:text-white font-bold text-xl transition">✕</button>
+            </div>
+            
+            <div id="cart-items" class="max-h-60 overflow-y-auto divide-y divide-white/10 pr-1"></div>
+
+            <div class="mt-4 border-t border-white/10 pt-4">
+                <div class="flex justify-between font-black text-lg mb-2">
+                    <span class="text-gray-300">ราคารวมทั้งหมด:</span>
+                    <span id="total-price" class="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-amber-300">0 เครดิต</span>
+                </div>
+
+                <div id="cart-credit-info" class="text-xs text-right text-gray-400 mb-4"></div>
+
+                <button onclick="checkout()" class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 border border-purple-400/30 text-white py-3.5 rounded-2xl font-bold shadow-neon-purple transition active:scale-95 text-xs flex items-center justify-center gap-2">
+                    <span>🐍</span> POST /api/checkout (ชำระด้วยเครดิต)
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Python Code Source Modal -->
+    <div id="python-code-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md hidden flex justify-center items-center z-50 p-4">
+        <div class="glass-card border border-blue-500/30 p-6 rounded-3xl w-full max-w-3xl max-h-[85vh] flex flex-col shadow-2xl relative text-white">
+            <div class="flex justify-between items-center mb-4 pb-2 border-b border-gray-800">
+                <h3 class="text-base font-bold text-blue-300 flex items-center gap-2">
+                    <span>📄</span> โค้ดต้นแบบ Python FastAPI Server (main.py)
+                </h3>
+                <button onclick="closePythonCodeModal()" class="text-gray-400 hover:text-white font-bold text-xl">✕</button>
+            </div>
+            <pre class="terminal-bg p-4 rounded-xl text-xs text-emerald-400 overflow-auto flex-grow font-mono leading-relaxed border border-gray-800 select-all">
+<span class="text-purple-400">from</span> fastapi <span class="text-purple-400">import</span> FastAPI, HTTPException
+<span class="text-purple-400">from</span> pydantic <span class="text-purple-400">import</span> BaseModel
+<span class="text-purple-400">from</span> datetime <span class="text-purple-400">import</span> datetime
+<span class="text-purple-400">import</span> sqlite3
+
+app = FastAPI(title=<span class="text-yellow-300">"Galaxy Gear API"</span>)
+
+<span class="text-gray-500"># Model สำหรับรับข้อมูลชำระเงิน</span>
+<span class="text-purple-400">class</span> <span class="text-yellow-300">CheckoutRequest</span>(BaseModel):
+    username: <span class="text-cyan-300">str</span>
+    items: <span class="text-cyan-300">list</span>
+    total_price: <span class="text-cyan-300">float</span>
+
+<span class="text-purple-400">@app.post</span>(<span class="text-yellow-300">"/api/checkout"</span>)
+<span class="text-purple-400">def</span> <span class="text-blue-400">process_checkout</span>(data: CheckoutRequest):
+    now = datetime.now()  <span class="text-gray-500"># บันทึกเวลาฝั่ง Python Backend</span>
+    
+    conn = sqlite3.connect(<span class="text-yellow-300">"galaxy_shop.db"</span>)
+    cursor = conn.cursor()
+    
+    <span class="text-gray-500"># ตรวจสอบเครดิตผู้ใช้</span>
+    cursor.execute(<span class="text-yellow-300">"SELECT credit FROM users WHERE username = ?"</span>, (data.username,))
+    user = cursor.fetchone()
+    
+    <span class="text-purple-400">if not</span> user <span class="text-purple-400">or</span> user[<span class="text-cyan-300">0</span>] < data.total_price:
+        conn.close()
+        <span class="text-purple-400">raise</span> HTTPException(status_code=<span class="text-cyan-300">400</span>, detail=<span class="text-yellow-300">"เครดิตไม่เพียงพอ"</span>)
+        
+    <span class="text-gray-500"># หักเครดิต & บันทึกคำสั่งซื้อลง SQLite</span>
+    new_credit = user[<span class="text-cyan-300">0</span>] - data.total_price
+    cursor.execute(<span class="text-yellow-300">"UPDATE users SET credit = ? WHERE username = ?"</span>, (new_credit, data.username))
+    cursor.execute(<span class="text-yellow-300">"INSERT INTO orders (username, total, created_at) VALUES (?, ?, ?)"</span>, 
+                   (data.username, data.total_price, now.strftime(<span class="text-yellow-300">"%Y-%m-%d %H:%M:%S"</span>)))
+    
+    conn.commit()
+    conn.close()
+    
+    <span class="text-purple-400">return</span> {
+        <span class="text-yellow-300">"status"</span>: <span class="text-yellow-300">"success"</span>,
+        <span class="text-yellow-300">"timestamp"</span>: now.strftime(<span class="text-yellow-300">"%Y-%m-%d %H:%M:%S"</span>),
+        <span class="text-yellow-300">"remaining_credit"</span>: new_credit
+    }</pre>
+            <div class="mt-4 flex justify-end">
+                <button onclick="closePythonCodeModal()" class="bg-gray-800 hover:bg-gray-700 text-white px-4 py-2 rounded-xl text-xs font-bold">ปิดหน้าต่าง</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2"></div>
+
+    <script>
+        // Data Store
+        const products = [
+            { id: 1, name: "คีย์บอร์ดกลไก RGB", category: "คีย์บอร์ด", price: 1590, img: "https://i.ibb.co/C3bBvCL3/image-2026-09-17-213354186.png" },
+            { id: 2, name: "เมาส์ไร้สาย Gaming", category: "เมาส์", price: 890, img: "https://i.ibb.co/dTt6q6L/image-2026-09-17-213612467.png" },
+            { id: 3, name: "หูฟัง Bluetooth", category: "หูฟัง", price: 1290, img: "https://i.ibb.co/MDgj39gQ/image-2026-09-17-213720718.png" },
+            { id: 4, name: "แผ่นรองเมาส์ขนาดใหญ่", category: "แผ่นรองเมาส์", price: 290, img: "https://i.ibb.co/ZzFvKwbR/image-2026-09-17-213820146.png" }
+        ];
+
+        const featuredCategoriesData = [
+            { id: 'คีย์บอร์ด', title: 'คีย์บอร์ดกลไก RGB', subtitle: 'สัมผัสการกดที่แม่นยำ', banner: 'https://i.ibb.co/C3bBvCL3/image-2026-09-17-213354186.png' },
+            { id: 'เมาส์', title: 'เมาส์ไร้สาย Gaming', subtitle: 'ตอบสนองไว ไร้สายรบกวน', banner: 'https://i.ibb.co/dTt6q6L/image-2026-09-17-213612467.png' },
+            { id: 'หูฟัง', title: 'หูฟัง Bluetooth', subtitle: 'มิติเสียงสมจริงรอบทิศทาง', banner: 'https://i.ibb.co/MDgj39gQ/image-2026-09-17-213720718.png' },
+            { id: 'แผ่นรองเมาส์', title: 'แผ่นรองเมาส์ขนาดใหญ่', subtitle: 'พื้นผิวลื่นไหล ควบคุมแม่นยำ', banner: 'https://i.ibb.co/ZzFvKwbR/image-2026-09-17-213820146.png' }
+        ];
+
+        let currentCategory = 'all';
+        let users = JSON.parse(localStorage.getItem('users')) || [];
+        
+        if (!users.find(u => u.username === 'admin')) {
+            users.push({ username: 'admin', password: '1234', role: 'admin', credit: 5000 });
+            localStorage.setItem('users', JSON.stringify(users));
+        }
+
+        let currentUser = JSON.parse(localStorage.getItem('currentUser')) || null;
+
+        // Python Terminal Logging Simulator
+        function pyLog(endpoint, method, message, status = 200) {
+            const now = new Date();
+            const timeStr = now.toISOString().replace('T', ' ').substring(0, 19);
+            const logContainer = document.getElementById('terminal-logs');
+            
+            const logItem = document.createElement('div');
+            const statusColor = status === 200 ? 'text-emerald-400' : 'text-red-400';
+            logItem.innerHTML = `
+                <span class="text-gray-500">[${timeStr}]</span> 
+                <span class="text-yellow-400 font-bold">${method}</span> 
+                <span class="text-cyan-300">${endpoint}</span> - 
+                <span class="${statusColor}">${status} OK</span> : 
+                <span class="text-gray-300">${message}</span>
+            `;
+            logContainer.appendChild(logItem);
+            logContainer.scrollTop = logContainer.scrollHeight;
+        }
+
+        function toggleTerminal() {
+            const drawer = document.getElementById('terminal-drawer');
+            drawer.classList.toggle('translate-y-full');
+        }
+
+        function clearTerminalLogs() {
+            document.getElementById('terminal-logs').innerHTML = `<div class="text-gray-500">[SYSTEM] Logs cleared.</div>`;
+        }
+
+        function openPythonCodeModal() {
+            document.getElementById('python-code-modal').classList.remove('hidden');
+        }
+        function closePythonCodeModal() {
+            document.getElementById('python-code-modal').classList.add('hidden');
+        }
+
+        function getCartStorageKey() {
+            return currentUser ? `cart_${currentUser.username}` : 'cart_guest';
+        }
+
+        function getUserCart() {
+            const key = getCartStorageKey();
+            return JSON.parse(localStorage.getItem(key)) || [];
+        }
+
+        function saveUserCart(cartData) {
+            const key = getCartStorageKey();
+            localStorage.setItem(key, JSON.stringify(cartData));
+        }
+
+        function renderFeaturedCategories() {
+            const container = document.getElementById('featured-categories');
+            container.innerHTML = featuredCategoriesData.map(cat => `
+                <div class="glass-card glass-card-hover rounded-3xl p-4 flex flex-col justify-between relative overflow-hidden group">
+                    <div class="relative w-full h-28 rounded-2xl overflow-hidden mb-2 flex items-center justify-center p-2">
+                        <img src="${cat.banner}" alt="${cat.title}" class="w-full h-full object-contain filter drop-shadow-[0_8px_12px_rgba(0,0,0,0.5)] transition-transform duration-500 group-hover:scale-110">
+                    </div>
+                    <div class="flex flex-col gap-2">
+                        <div>
+                            <h3 class="font-bold text-gray-100 text-xs leading-tight group-hover:text-purple-300 transition">${cat.title}</h3>
+                            <p class="text-[10px] text-gray-400 mt-0.5 line-clamp-1">${cat.subtitle}</p>
+                        </div>
+                        <button onclick="filterCategory('${cat.id}')" 
+                            class="w-full mt-1 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-400 hover:to-amber-400 border border-orange-400/30 text-white text-[11px] font-bold py-2 rounded-xl transition active:scale-95 shadow-neon-orange">
+                            ดูสินค้า
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderCategoryButtons() {
+            const categories = ['all', ...new Set(products.map(p => p.category))];
+            const container = document.getElementById('category-buttons');
+            
+            container.innerHTML = categories.map(cat => {
+                const isActive = currentCategory === cat;
+                const label = cat === 'all' ? 'ทั้งหมด' : cat;
+                return `
+                    <button onclick="filterCategory('${cat}')" 
+                        class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition active:scale-95 border backdrop-blur-md ${
+                            isActive 
+                            ? 'bg-purple-600/80 text-white border-purple-400/80 shadow-neon-purple' 
+                            : 'glass-card text-gray-300 hover:bg-gray-800/40 border-white/10'
+                        }">
+                        ${label}
+                    </button>
+                `;
+            }).join('');
+        }
+
+        function filterCategory(category) {
+            currentCategory = category;
+            renderCategoryButtons();
+            renderProducts();
+            pyLog(`/api/products?category=${category}`, 'GET', `Fetched ${category} products`);
+        }
+
+        function renderProducts() {
+            const grid = document.getElementById('product-grid');
+            const filtered = currentCategory === 'all' 
+                ? products 
+                : products.filter(p => p.category === currentCategory);
+
+            if (filtered.length === 0) {
+                grid.innerHTML = `<p class="col-span-full text-center text-gray-400 py-12 text-xs">ไม่พบสินค้าในหมวดหมู่นี้</p>`;
+                return;
+            }
+
+            grid.innerHTML = filtered.map(product => `
+                <div class="glass-card glass-card-hover rounded-3xl p-4 flex flex-col justify-between relative group">
+                    <div>
+                        <div class="relative overflow-hidden rounded-2xl mb-3 flex items-center justify-center h-40 p-2">
+                            <img src="${product.img}" alt="${product.name}" class="w-full h-full object-contain filter drop-shadow-[0_8px_12px_rgba(0,0,0,0.6)] transition-transform duration-500 group-hover:scale-105">
+                            <span class="absolute top-2 left-2 bg-purple-950/80 backdrop-blur-md text-purple-300 text-[10px] font-bold px-2 py-0.5 rounded-full border border-purple-500/30">
+                                ${product.category}
+                            </span>
+                        </div>
+                        <h3 class="font-bold text-gray-100 text-xs mb-1 line-clamp-2 group-hover:text-purple-300 transition">${product.name}</h3>
+                        <p class="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-amber-300 font-black text-base mb-3">${product.price.toLocaleString()} เครดิต</p>
+                    </div>
+                    <button onclick="addToCart(${product.id})" class="w-full bg-purple-600/80 hover:bg-purple-500 border border-purple-400/30 text-white font-bold py-2 rounded-xl transition active:scale-95 shadow-neon-purple text-xs">
+                        + เพิ่มลงตะกร้า
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            const bgClass = type === 'success' ? 'bg-purple-950/90 border-purple-500/40 text-purple-200' : 'bg-red-950/90 border-red-500/40 text-red-200';
+            
+            toast.className = `${bgClass} backdrop-blur-md px-4 py-3 rounded-2xl shadow-2xl animate-toast flex items-center gap-2 text-xs font-bold border`;
+            toast.innerHTML = `<span>${type === 'success' ? '✅' : '⚠️'}</span> ${message}`;
+            
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 2500);
+        }
+
+        function openAuthModal(tab = 'login') {
+            switchAuthTab(tab);
+            const modal = document.getElementById('auth-modal');
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                modal.querySelector('.transform').classList.remove('scale-95');
+            }, 10);
+        }
+
+        function closeAuthModal() {
+            const modal = document.getElementById('auth-modal');
+            modal.classList.add('opacity-0');
+            modal.querySelector('.transform').classList.add('scale-95');
+            setTimeout(() => modal.classList.add('hidden'), 300);
+        }
+
+        function switchAuthTab(tab) {
+            document.getElementById('login-form-container').classList.toggle('hidden', tab !== 'login');
+            document.getElementById('register-form-container').classList.toggle('hidden', tab !== 'register');
+        }
+
+        function handleRegister(e) {
+            e.preventDefault();
+            const username = document.getElementById('reg-username').value.trim();
+            const password = document.getElementById('reg-password').value;
+            const confirmPassword = document.getElementById('reg-confirm-password').value;
+
+            if (password !== confirmPassword) {
+                pyLog('/api/register', 'POST', 'Registration failed: Passwords do not match', 400);
+                showToast("รหัสผ่านไม่ตรงกัน", "error");
+                return;
+            }
+            if (users.find(u => u.username === username)) {
+                pyLog('/api/register', 'POST', `Registration failed: Username '${username}' exists`, 400);
+                showToast("ชื่อผู้ใช้นี้ถูกใช้งานแล้ว", "error");
+                return;
+            }
+
+            users.push({ username, password, role: 'user', credit: 0 });
+            localStorage.setItem('users', JSON.stringify(users));
+            pyLog('/api/register', 'POST', `User '${username}' created in SQLite DB with 0 credit`);
+            showToast("สมัครสมาชิกสำเร็จ!");
+            switchAuthTab('login');
+        }
+
+        function handleLogin(e) {
+            e.preventDefault();
+            const username = document.getElementById('login-username').value.trim();
+            const password = document.getElementById('login-password').value;
+
+            const user = users.find(u => u.username === username && u.password === password);
+            if (user) {
+                currentUser = { username: user.username, role: user.role || 'user' };
+                localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                
+                pyLog('/api/login', 'POST', `Auth token generated for user '${username}'`);
+                updateAuthUI();
+                updateCartUI();
+                closeAuthModal();
+                showToast(`ยินดีต้อนรับคุณ ${user.username}!`);
+            } else {
+                pyLog('/api/login', 'POST', `Invalid credentials for user '${username}'`, 401);
+                showToast("ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง", "error");
+            }
+        }
+
+        function logout() {
+            if (currentUser) {
+                pyLog('/api/logout', 'POST', `User '${currentUser.username}' logged out`);
+            }
+            currentUser = null;
+            localStorage.removeItem('currentUser');
+            updateAuthUI();
+            updateCartUI();
+            showToast("ออกจากระบบแล้ว");
+        }
+
+        function getCurrentUserCredit() {
+            if (!currentUser) return 0;
+            const userObj = users.find(u => u.username === currentUser.username);
+            return userObj ? (userObj.credit || 0) : 0;
+        }
+
+        function updateAuthUI() {
+            const loginBtn = document.getElementById('login-btn');
+            const userInfo = document.getElementById('user-info');
+            const userDisplayName = document.getElementById('user-display-name');
+            const userCreditDisplay = document.getElementById('user-credit-display');
+            const adminSection = document.getElementById('admin-add-product-section');
+
+            if (currentUser) {
+                loginBtn.classList.add('hidden');
+                userInfo.classList.remove('hidden');
+                
+                const credit = getCurrentUserCredit();
+                userCreditDisplay.innerText = `💳 เครดิต: ${credit.toLocaleString()} ฿`;
+
+                userDisplayName.innerText = currentUser.role === 'admin' 
+                    ? `👑 ${currentUser.username}` 
+                    : `👤 ${currentUser.username}`;
+
+                if (currentUser.role === 'admin') {
+                    adminSection.classList.remove('hidden');
+                    updateUserDropdown();
+                } else {
+                    adminSection.classList.add('hidden');
+                }
+            } else {
+                loginBtn.classList.remove('hidden');
+                userInfo.classList.add('hidden');
+                adminSection.classList.add('hidden');
+            }
+        }
+
+        function updateUserDropdown() {
+            const select = document.getElementById('credit-target-user');
+            select.innerHTML = users.map(u => `
+                <option value="${u.username}">
+                    ${u.username} (${u.role === 'admin' ? 'Admin' : 'User'}) - ${u.credit || 0} ฿
+                </option>
+            `).join('');
+        }
+
+        function handleCreditSubmit(event) {
+            event.preventDefault();
+            const targetUsername = document.getElementById('credit-target-user').value;
+            const amount = Number(document.getElementById('credit-amount').value);
+
+            const userObj = users.find(u => u.username === targetUsername);
+            if (userObj) {
+                userObj.credit = (userObj.credit || 0) + amount;
+                localStorage.setItem('users', JSON.stringify(users));
+                
+                pyLog('/api/admin/add-credit', 'POST', `Added ${amount} credits to user '${targetUsername}'`);
+                showToast(`เติม ${amount.toLocaleString()} เครดิตให้ ${targetUsername} แล้ว!`);
+                updateAuthUI();
+                updateCartUI();
+                document.getElementById('credit-amount').value = '';
+            }
+        }
+
+        function handleFormSubmit(event) {
+            event.preventDefault();
+            const name = document.getElementById('prod-name').value;
+            const price = Number(document.getElementById('prod-price').value);
+            const category = document.getElementById('prod-category').value;
+            const img = document.getElementById('prod-img').value;
+
+            const newProduct = {
+                id: products.length > 0 ? products[products.length - 1].id + 1 : 1,
+                name, price, category, img
+            };
+
+            products.push(newProduct);
+            renderCategoryButtons();
+            renderProducts();
+
+            pyLog('/api/products', 'POST', `New product '${name}' inserted into SQLite`);
+            document.getElementById('add-product-form').reset();
+            showToast("เพิ่มสินค้าใหม่ลงฐานข้อมูลเรียบร้อย!");
+        }
+
+        function addToCart(productId) {
+            let cart = getUserCart();
+            const product = products.find(p => p.id === productId);
+            const item = cart.find(i => i.id === productId);
+
+            if (item) item.quantity += 1;
+            else cart.push({ ...product, quantity: 1 });
+
+            saveUserCart(cart);
+            updateCartUI();
+            
+            const userOwner = currentUser ? currentUser.username : 'guest';
+            pyLog(`/api/cart/${userOwner}`, 'POST', `Added '${product.name}' to user cart`);
+            showToast(`เพิ่ม "${product.name}" ลงตะกร้าแล้ว`);
+        }
+
+        function updateCartUI() {
+            const cart = getUserCart();
+            const totalCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+            document.getElementById('cart-count').innerText = totalCount;
+
+            const ownerLabel = document.getElementById('cart-owner-label');
+            ownerLabel.innerText = currentUser 
+                ? `Cart Session: user_${currentUser.username}` 
+                : `Cart Session: guest_temp`;
+
+            const cartItemsDiv = document.getElementById('cart-items');
+            if (cart.length === 0) {
+                cartItemsDiv.innerHTML = `<p class="text-gray-400 text-center py-6 text-xs">ไม่มีสินค้าในตะกร้า</p>`;
+            } else {
+                cartItemsDiv.innerHTML = cart.map(item => `
+                    <div class="flex justify-between items-center py-2.5">
+                        <div>
+                            <p class="font-bold text-gray-200 text-xs">${item.name}</p>
+                            <p class="text-[10px] text-purple-300/70 mt-0.5">${item.price.toLocaleString()} เครดิต × ${item.quantity}</p>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <span class="font-black text-amber-400 text-xs">${(item.price * item.quantity).toLocaleString()} เครดิต</span>
+                            <button onclick="removeFromCart(${item.id})" class="text-red-400 hover:text-red-300 font-bold p-1 text-xs">✕</button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            document.getElementById('total-price').innerText = `${total.toLocaleString()} เครดิต`;
+
+            const creditInfoDiv = document.getElementById('cart-credit-info');
+            if (currentUser) {
+                const userCredit = getCurrentUserCredit();
+                if (userCredit >= total) {
+                    creditInfoDiv.innerHTML = `<span class="text-emerald-400 font-bold">✓ เครดิตคงเหลือ: ${userCredit.toLocaleString()} ฿</span>`;
+                } else {
+                    creditInfoDiv.innerHTML = `<span class="text-red-400 font-bold">✕ เครดิตไม่พอ (ขาดอีก ${(total - userCredit).toLocaleString()} ฿)</span>`;
+                }
+            } else {
+                creditInfoDiv.innerHTML = `<span class="text-amber-400">กรุณาเข้าสู่ระบบก่อนชำระเงิน</span>`;
+            }
+        }
+
+        function removeFromCart(productId) {
+            let cart = getUserCart();
+            cart = cart.filter(item => item.id !== productId);
+            saveUserCart(cart);
+            updateCartUI();
+            
+            const userOwner = currentUser ? currentUser.username : 'guest';
+            pyLog(`/api/cart/${userOwner}`, 'DELETE', `Item ID ${productId} removed from cart`);
+        }
+
+        function toggleCartModal() {
+            const modal = document.getElementById('cart-modal');
+            if (modal.classList.contains('hidden')) {
+                modal.classList.remove('hidden');
+                setTimeout(() => {
+                    modal.classList.remove('opacity-0');
+                    modal.querySelector('.transform').classList.remove('scale-95');
+                }, 10);
+            } else {
+                modal.classList.add('opacity-0');
+                modal.querySelector('.transform').classList.add('scale-95');
+                setTimeout(() => modal.classList.add('hidden'), 300);
+            }
+        }
+
+        function checkout() {
+            let cart = getUserCart();
+            if (cart.length === 0) {
+                showToast("กรุณาเลือกสินค้าก่อนทำรายการ", "error");
+                return;
+            }
+            if (!currentUser) {
+                showToast("กรุณาเข้าสู่ระบบก่อนสั่งซื้อ", "error");
+                toggleCartModal();
+                openAuthModal('login');
+                return;
+            }
+
+            const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            const userObj = users.find(u => u.username === currentUser.username);
+
+            if (!userObj || (userObj.credit || 0) < total) {
+                pyLog('/api/checkout', 'POST', `Checkout failed: Insufficient credit for user '${currentUser.username}'`, 400);
+                showToast("เครดิตของคุณไม่พอสำหรับการสั่งซื้อนี้!", "error");
+                return;
+            }
+
+            // Deduct credit
+            userObj.credit -= total;
+            localStorage.setItem('users', JSON.stringify(users));
+
+            // Generate Python timestamp
+            const now = new Date();
+            const timeFormatted = now.toISOString().replace('T', ' ').substring(0, 19);
+
+            pyLog('/api/checkout', 'POST', `Order placed! Deducted ${total} credits. Saved order to SQLite at ${timeFormatted}`);
+            showToast(`สั่งซื้อสำเร็จ! หัก ${total.toLocaleString()} เครดิตเรียบร้อย`);
+            
+            saveUserCart([]);
+            updateAuthUI();
+            updateCartUI();
+            toggleCartModal();
+        }
+
+        // Initialize Application
+        window.onload = function() {
+            renderFeaturedCategories();
+            renderCategoryButtons();
+            renderProducts();
+            updateAuthUI();
+            updateCartUI();
+            pyLog('/api/status', 'GET', 'System initialized & ready for Python simulator requests');
+        };
+    </script>
+</body>
+</html>
