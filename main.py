@@ -28,7 +28,7 @@ def serve_galaxy_gear_app():
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Galaxy Gear - Fullstack Web & Music Player</title>
+    <title>Galaxy Gear - Fullstack Web & Playlist CD Player</title>
     <!-- Tailwind CSS & FontAwesome -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
@@ -257,13 +257,13 @@ def serve_galaxy_gear_app():
         <div id="product-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"></div>
     </main>
 
-    <!-- Floating Spinning CD Record Music Player (Updated Ultra-Stylish UI) -->
+    <!-- Floating Spinning CD Record Music Player with Playlist Selector -->
     <div class="fixed bottom-0 left-0 right-0 z-50 glass-nav border-t border-purple-500/40 p-3 px-6 flex items-center justify-between shadow-2xl">
         <div class="flex items-center gap-4">
             <!-- CD Disc Record with Cover Art -->
             <div onclick="toggleMusic()" class="relative w-12 h-12 rounded-full cursor-pointer group flex-shrink-0">
                 <div id="cd-disc" class="w-full h-full rounded-full border-2 border-purple-400/60 overflow-hidden shadow-neon-purple p-0.5 bg-black relative animate-spin-cd">
-                    <img src="https://img.youtube.com/vi/pP-0CzmxLE4/hqdefault.jpg" class="w-full h-full object-cover rounded-full">
+                    <img id="cd-cover-img" src="https://img.youtube.com/vi/pP-0CzmxLE4/hqdefault.jpg" class="w-full h-full object-cover rounded-full">
                     <div class="absolute inset-0 m-auto w-3.5 h-3.5 rounded-full bg-slate-950 border border-purple-400/80 shadow-inner flex items-center justify-center">
                         <div class="w-1.5 h-1.5 rounded-full bg-slate-900"></div>
                     </div>
@@ -274,11 +274,15 @@ def serve_galaxy_gear_app():
             </div>
 
             <div>
-                <div class="flex items-center gap-2">
-                    <span class="text-xs font-bold text-purple-200">Real J - “ ศีลแตก ” (Feat. FLAMELIGHT & XANICBOY$ )</span>
+                <!-- Playlist Select Dropdown -->
+                <div class="flex items-center gap-2 mb-0.5">
+                    <select id="playlist-select" onchange="changeTrack(this.value)" class="bg-gray-900/90 border border-purple-500/40 text-purple-200 text-xs font-bold rounded-xl px-2.5 py-1 focus:outline-none focus:border-purple-400 shadow-md">
+                        <option value="0">🎵 Real J - “ ศีลแตก ”</option>
+                        <option value="1">🎵 Donell Jones - Natural Thang</option>
+                    </select>
                     <span class="text-[9px] bg-purple-950/80 text-purple-300 px-2 py-0.5 rounded-full border border-purple-500/30 font-mono">🔊 Vol: 15%</span>
                 </div>
-                <p id="music-status" class="text-[10px] text-emerald-400 font-mono mt-0.5">💿 CD Spinning & Playing...</p>
+                <p id="music-status" class="text-[10px] text-emerald-400 font-mono">💿 CD Spinning & Playing...</p>
             </div>
         </div>
 
@@ -288,7 +292,7 @@ def serve_galaxy_gear_app():
                 <i id="music-icon" class="fa-solid fa-pause text-xs"></i>
                 <span id="music-btn-text" class="tracking-wide">พักเพลง</span>
             </button>
-            <a href="https://www.youtube.com/watch?v=pP-0CzmxLE4" target="_blank" class="glass-card hover:bg-red-950/40 text-red-400 hover:text-red-300 px-3.5 py-2 rounded-2xl text-xs font-bold border border-red-500/30 transition flex items-center gap-2 shadow-lg">
+            <a id="yt-link" href="https://www.youtube.com/watch?v=pP-0CzmxLE4" target="_blank" class="glass-card hover:bg-red-950/40 text-red-400 hover:text-red-300 px-3.5 py-2 rounded-2xl text-xs font-bold border border-red-500/30 transition flex items-center gap-2 shadow-lg">
                 <i class="fa-brands fa-youtube text-red-500 text-sm"></i>
                 <span class="hidden sm:inline">YouTube</span>
             </a>
@@ -434,31 +438,61 @@ app = FastAPI(title=<span class="text-yellow-300">"Galaxy Gear API"</span>)
     <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2"></div>
 
     <script>
+        const playlist = [
+            { id: "pP-0CzmxLE4", title: "Real J - “ ศีลแตก ”", img: "https://img.youtube.com/vi/pP-0CzmxLE4/hqdefault.jpg", url: "https://www.youtube.com/watch?v=pP-0CzmxLE4" },
+            { id: "xX_cNxhafmw", title: "Donell Jones - Natural Thang", img: "https://img.youtube.com/vi/xX_cNxhafmw/hqdefault.jpg", url: "https://www.youtube.com/watch?v=xX_cNxhafmw" }
+        ];
+
+        let currentTrackIndex = 0;
         let ytPlayer;
-        let isMusicPlaying = true;
+        let isMusicPlaying = false;
 
         function onYouTubeIframeAPIReady() {
             ytPlayer = new YT.Player('player-container', {
                 height: '1',
                 width: '1',
-                videoId: 'pP-0CzmxLE4',
+                videoId: playlist[currentTrackIndex].id,
                 playerVars: {
                     'autoplay': 1,
                     'controls': 0,
                     'loop': 1,
-                    'playlist': 'pP-0CzmxLE4'
+                    'playlist': playlist[currentTrackIndex].id,
+                    'origin': window.location.origin
                 },
                 events: {
-                    'onReady': onPlayerReady
+                    'onReady': onPlayerReady,
+                    'onStateChange': onPlayerStateChange
                 }
             });
         }
 
         function onPlayerReady(event) {
-            // Set soft volume level suitable for single-user listening (15%)
             event.target.setVolume(15);
             event.target.playVideo();
             updateMusicUI(true);
+        }
+
+        function onPlayerStateChange(event) {
+            if (event.data === YT.PlayerState.PLAYING) {
+                updateMusicUI(true);
+            } else if (event.data === YT.PlayerState.PAUSED) {
+                updateMusicUI(false);
+            }
+        }
+
+        function changeTrack(index) {
+            currentTrackIndex = parseInt(index);
+            const track = playlist[currentTrackIndex];
+
+            document.getElementById('cd-cover-img').src = track.img;
+            document.getElementById('yt-link').href = track.url;
+
+            if (ytPlayer && typeof ytPlayer.loadVideoById === 'function') {
+                ytPlayer.loadVideoById(track.id);
+                ytPlayer.setVolume(15);
+                ytPlayer.playVideo();
+                updateMusicUI(true);
+            }
         }
 
         function toggleMusic() {
@@ -970,13 +1004,18 @@ app = FastAPI(title=<span class="text-yellow-300">"Galaxy Gear API"</span>)
             updateCartCount();
             pyLog('/api/init', 'GET', 'Galaxy Gear Frontend Initialized and Connected to FastAPI Server');
             
-            // First user interaction auto-play fallback for strict browser audio policies
-            document.body.addEventListener('click', () => {
+            // Automatic trigger upon any user gesture on page
+            const triggerAutoplay = () => {
                 if (ytPlayer && typeof ytPlayer.playVideo === 'function' && !isMusicPlaying) {
+                    ytPlayer.setVolume(15);
                     ytPlayer.playVideo();
                     updateMusicUI(true);
                 }
-            }, { once: true });
+            };
+
+            ['click', 'touchstart', 'scroll', 'keydown'].forEach(evt => {
+                window.addEventListener(evt, triggerAutoplay, { once: true });
+            });
         };
     </script>
 </body>
