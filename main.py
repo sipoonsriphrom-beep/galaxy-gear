@@ -28,7 +28,7 @@ def serve_galaxy_gear_app():
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Galaxy Gear - Fullstack Web & Python Simulator</title>
+    <title>Galaxy Gear - Fullstack Web & Music Player</title>
     <!-- Tailwind CSS & FontAwesome -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
@@ -108,7 +108,7 @@ def serve_galaxy_gear_app():
         .animate-toast { animation: slideIn 0.3s ease-out forwards; }
     </style>
 </head>
-<body class="font-sans text-gray-100 antialiased min-h-screen flex flex-col relative selection:bg-purple-500 selection:text-white pb-16">
+<body class="font-sans text-gray-100 antialiased min-h-screen flex flex-col relative selection:bg-purple-500 selection:text-white pb-28">
 
     <!-- Header / Navbar -->
     <header class="glass-nav text-white p-4 sticky top-0 z-30 shadow-2xl">
@@ -137,7 +137,10 @@ def serve_galaxy_gear_app():
                             💳 0 ฿
                         </span>
                         <span id="user-display-name" class="font-bold text-purple-300 text-xs"></span>
-                        <button onclick="logout()" class="bg-red-500/20 hover:bg-red-500 text-red-300 hover:text-white px-2.5 py-1 rounded-lg text-xs font-semibold transition active:scale-95 border border-red-500/30">
+                        <button onclick="deleteAccountPrompt()" class="bg-red-500/20 hover:bg-red-500 text-red-300 hover:text-white px-2 py-1 rounded-lg text-xs font-semibold transition border border-red-500/30">
+                            ลบแถบ
+                        </button>
+                        <button onclick="logout()" class="bg-gray-700/50 hover:bg-gray-600 text-gray-300 px-2 py-1 rounded-lg text-xs font-semibold transition">
                             ออก
                         </button>
                     </div>
@@ -164,7 +167,7 @@ def serve_galaxy_gear_app():
                         <span class="bg-purple-500/20 text-purple-300 text-[10px] px-2 py-0.5 rounded border border-purple-400/30 font-mono">FastAPI + SQLite</span>
                     </h2>
                     <p class="text-xs text-gray-400 mt-0.5">
-                        ทุกแอคชัน (สมัครสมาชิก, ล็อกอิน, ตะกร้าแยกผู้ใช้, ตัดเครดิต, สั่งซื้อ) ถูกประมวลผลด้วยจำลองโค้ด Python และเก็บบันทึกประวัติเวลา Timestamp อัตโนมัติ
+                        ทุกแอคชัน (สมัครสมาชิก, ล็อกอิน, ตะกร้าแยกผู้ใช้, ตัดเครดิต, สั่งซื้อ) ถูกประมวลผลด้วยจำลองโค้ด Python
                     </p>
                 </div>
             </div>
@@ -175,6 +178,7 @@ def serve_galaxy_gear_app():
             </div>
         </div>
 
+        <!-- Admin Control Panel -->
         <section id="admin-add-product-section" class="hidden glass-card p-6 rounded-3xl shadow-2xl border border-purple-500/30 mb-10 space-y-6">
             <h2 class="text-xl font-black text-purple-400 flex items-center gap-2 tracking-wide">
                 👑 แผงควบคุมผู้ดูแลระบบ (Admin Python Control)
@@ -241,7 +245,29 @@ def serve_galaxy_gear_app():
         <div id="product-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"></div>
     </main>
 
-    <div id="terminal-drawer" class="fixed bottom-0 left-0 right-0 z-40 transform translate-y-full transition-transform duration-300 ease-in-out">
+    <!-- Floating Background Music Player Bar -->
+    <div class="fixed bottom-0 left-0 right-0 z-50 glass-nav border-t border-purple-500/30 p-3 px-6 flex items-center justify-between shadow-2xl">
+        <div class="flex items-center gap-3">
+            <button id="music-play-btn" onclick="toggleMusic()" class="w-10 h-10 rounded-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white flex items-center justify-center text-sm font-bold shadow-neon-purple transition active:scale-95">
+                <i id="music-icon" class="fa-solid fa-play ml-0.5"></i>
+            </button>
+            <div>
+                <div class="flex items-center gap-2">
+                    <span class="text-xs font-bold text-purple-300">Real J - “ ศีลแตก ” (Feat. FLAMELIGHT & XANICBOY$ )</span>
+                    <span class="text-[10px] bg-red-900/60 text-red-300 px-2 py-0.5 rounded-full border border-red-500/30">YouTube Music</span>
+                </div>
+                <p id="music-status" class="text-[10px] text-gray-400">กดปุ่มเล่นเพื่อเปิดเพลงฟังในเว็บ</p>
+            </div>
+        </div>
+        <a href="https://www.youtube.com/watch?v=pP-0CzmxLE4" target="_blank" class="text-xs text-purple-400 hover:text-purple-300 flex items-center gap-1 underline">
+            <i class="fa-brands fa-youtube text-red-500"></i> ดูบน YouTube
+        </a>
+    </div>
+
+    <!-- Hidden YouTube Audio Player -->
+    <iframe id="yt-player" class="hidden" width="1" height="1" src="https://www.youtube.com/embed/pP-0CzmxLE4?enablejsapi=1" allow="autoplay"></iframe>
+
+    <div id="terminal-drawer" class="fixed bottom-16 left-0 right-0 z-40 transform translate-y-full transition-transform duration-300 ease-in-out">
         <div class="terminal-bg border-t-2 border-yellow-500/50 shadow-2xl rounded-t-2xl p-4 text-xs font-mono text-emerald-400 max-w-7xl mx-auto border-x border-white/10">
             <div class="flex justify-between items-center pb-2 mb-2 border-b border-gray-800">
                 <div class="flex items-center gap-2">
@@ -376,6 +402,25 @@ app = FastAPI(title=<span class="text-yellow-300">"Galaxy Gear API"</span>)
     <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2"></div>
 
     <script>
+        let isPlaying = false;
+        function toggleMusic() {
+            const iframe = document.getElementById('yt-player');
+            const icon = document.getElementById('music-icon');
+            const status = document.getElementById('music-status');
+
+            if (!isPlaying) {
+                iframe.src = "https://www.youtube.com/embed/pP-0CzmxLE4?autoplay=1&enablejsapi=1";
+                icon.className = "fa-solid fa-pause ml-0.5";
+                status.innerText = "กำลังเล่นเพลง...";
+                isPlaying = true;
+            } else {
+                iframe.src = "https://www.youtube.com/embed/pP-0CzmxLE4?enablejsapi=1";
+                icon.className = "fa-solid fa-play ml-0.5";
+                status.innerText = "หยุดเล่นเพลงแล้ว";
+                isPlaying = false;
+            }
+        }
+
         const products = [
             { id: 1, name: "คีย์บอร์ดกลไก RGB Custom", category: "คีย์บอร์ด", price: 1590, icon: "fa-keyboard", color: "from-purple-600 to-indigo-600" },
             { id: 2, name: "เมาส์ไร้สาย Gaming 26k DPI", category: "เมาส์", price: 890, icon: "fa-computer-mouse", color: "from-pink-600 to-rose-600" },
@@ -715,7 +760,6 @@ app = FastAPI(title=<span class="text-yellow-300">"Galaxy Gear API"</span>)
             if (p !== cp) return showToast('รหัสผ่านไม่ตรงกัน', 'error');
             if (users.find(x => x.username === u)) return showToast('มีชื่อผู้ใช้นี้อยู่แล้ว', 'error');
 
-            // ✅ ตั้งค่าให้ผู้สมัครใหม่มี 0 เครดิต
             const newUser = { username: u, password: p, role: 'user', credit: 0 };
             users.push(newUser);
             localStorage.setItem('users', JSON.stringify(users));
@@ -723,6 +767,21 @@ app = FastAPI(title=<span class="text-yellow-300">"Galaxy Gear API"</span>)
             showToast('สมัครสมาชิกสำเร็จ! กรุณาติดต่อ Admin เพื่อเติมเครดิต', 'success');
             pyLog('/api/register', 'POST', `Registered new user '${u}' with 0 credit into SQLite DB`);
             switchAuthTab('login');
+        }
+
+        function deleteAccountPrompt() {
+            if (!currentUser) return;
+            if (confirm(`คุณต้องการลบบัญชี '${currentUser.username}' ออกจากระบบใช่หรือไม่?`)) {
+                users = users.filter(u => u.username !== currentUser.username);
+                localStorage.setItem('users', JSON.stringify(users));
+                localStorage.removeItem(`cart_${currentUser.username}`);
+                pyLog('/api/user/delete', 'DELETE', `User '${currentUser.username}' deleted account from SQLite DB`);
+                currentUser = null;
+                localStorage.removeItem('currentUser');
+                updateAuthUI();
+                updateCartCount();
+                showToast('ลบบัญชีเรียบร้อยแล้ว', 'info');
+            }
         }
 
         function logout() {
