@@ -10,8 +10,14 @@ from fastapi import FastAPI, HTTPException
 from fastapi.responses import HTMLResponse
 from pydantic import BaseModel
 from datetime import datetime
+import sqlite3
 
-app = FastAPI(title="Galaxy Gear Store API")
+app = FastAPI(title="Galaxy Gear API")
+
+class CheckoutRequest(BaseModel):
+    username: str
+    items: list
+    total_price: float
 
 @app.get("/api/health")
 def health_check():
@@ -20,6 +26,23 @@ def health_check():
         "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         "server": "Python FastAPI on Render"
     }
+
+@app.post("/api/checkout")
+def process_checkout(data: CheckoutRequest):
+    conn = sqlite3.connect("galaxy_shop.db")
+    cursor = conn.cursor()
+    cursor.execute("SELECT credit FROM users WHERE username = ?", (data.username,))
+    user = cursor.fetchone()
+    
+    if not user or user[0] < data.total_price:
+        conn.close()
+        raise HTTPException(status_code=400, detail="เครดิตไม่เพียงพอ")
+        
+    new_credit = user[0] - data.total_price
+    cursor.execute("UPDATE users SET credit = ? WHERE username = ?", (new_credit, data.username))
+    conn.commit()
+    conn.close()
+    return {"status": "success", "remaining_credit": new_credit}
 
 @app.get("/", response_class=HTMLResponse)
 def serve_galaxy_gear_app():
@@ -402,33 +425,41 @@ def serve_galaxy_gear_app():
                 <button onclick="closePythonCodeModal()" class="text-gray-400 hover:text-white font-bold text-xl">✕</button>
             </div>
             <pre class="terminal-bg p-4 rounded-xl text-xs text-emerald-400 overflow-auto flex-grow font-mono leading-relaxed border border-gray-800 select-all">
-<span class="text-purple-400">from</span> fastapi <span class="text-purple-400">import</span> FastAPI, HTTPException
-<span class="text-purple-400">from</span> pydantic <span class="text-purple-400">import</span> BaseModel
-<span class="text-purple-400">from</span> datetime <span class="text-purple-400">import</span> datetime
-<span class="text-purple-400">import</span> sqlite3
+from fastapi import FastAPI, HTTPException
+from fastapi.responses import HTMLResponse
+from pydantic import BaseModel
+from datetime import datetime
+import sqlite3
 
-app = FastAPI(title=<span class="text-yellow-300">"Galaxy Gear API"</span>)
+app = FastAPI(title="Galaxy Gear API")
 
-<span class="text-purple-400">class</span> <span class="text-yellow-300">CheckoutRequest</span>(BaseModel):
-    username: <span class="text-cyan-300">str</span>
-    items: <span class="text-cyan-300">list</span>
-    total_price: <span class="text-cyan-300">float</span>
+class CheckoutRequest(BaseModel):
+    username: str
+    items: list
+    total_price: float
 
-<span class="text-purple-400">@app.post</span>(<span class="text-yellow-300">"/api/checkout"</span>)
-<span class="text-purple-400">def</span> <span class="text-blue-400">process_checkout</span>(data: CheckoutRequest):
-    now = datetime.now()
-    conn = sqlite3.connect(<span class="text-yellow-300">"galaxy_shop.db"</span>)
+@app.get("/api/health")
+def health_check():
+    return {
+        "status": "online",
+        "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "server": "Python FastAPI on Render"
+    }
+
+@app.post("/api/checkout")
+def process_checkout(data: CheckoutRequest):
+    conn = sqlite3.connect("galaxy_shop.db")
     cursor = conn.cursor()
-    cursor.execute(<span class="text-yellow-300">"SELECT credit FROM users WHERE username = ?"</span>, (data.username,))
+    cursor.execute("SELECT credit FROM users WHERE username = ?", (data.username,))
     user = cursor.fetchone()
-    <span class="text-purple-400">if not</span> user <span class="text-purple-400">or</span> user[<span class="text-cyan-300">0</span>] < data.total_price:
+    if not user or user[0] < data.total_price:
         conn.close()
-        <span class="text-purple-400">raise</span> HTTPException(status_code=<span class="text-cyan-300">400</span>, detail=<span class="text-yellow-300">"เครดิตไม่เพียงพอ"</span>)
-    new_credit = user[<span class="text-cyan-300">0</span>] - data.total_price
-    cursor.execute(<span class="text-yellow-300">"UPDATE users SET credit = ? WHERE username = ?"</span>, (new_credit, data.username))
+        raise HTTPException(status_code=400, detail="เครดิตไม่เพียงพอ")
+    new_credit = user[0] - data.total_price
+    cursor.execute("UPDATE users SET credit = ? WHERE username = ?", (new_credit, data.username))
     conn.commit()
     conn.close()
-    <span class="text-purple-400">return</span> {<span class="text-yellow-300">"status"</span>: <span class="text-yellow-300">"success"</span>, <span class="text-yellow-300">"remaining_credit"</span>: new_credit}</pre>
+    return {"status": "success", "remaining_credit": new_credit}</pre>
             <div class="mt-4 flex justify-end">
                 <button onclick="closePythonCodeModal()" class="bg-gray-800 hover:bg-gray-700 text-white px-4 py-2 rounded-xl text-xs font-bold">ปิดหน้าต่าง</button>
             </div>
