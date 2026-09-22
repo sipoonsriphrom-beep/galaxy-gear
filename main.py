@@ -28,7 +28,7 @@ def serve_galaxy_gear_app():
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Galaxy Gear - Fullstack Web & Music Player</title>
+    <title>Galaxy Gear - Fullstack Web & Vinyl CD Music Player</title>
     <!-- Tailwind CSS & FontAwesome -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
@@ -101,6 +101,18 @@ def serve_galaxy_gear_app():
             font-family: 'Courier New', Courier, monospace;
         }
 
+        /* CD Vinyl Spin Animation */
+        @keyframes spinSlow {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .animate-spin-cd {
+            animation: spinSlow 4s linear infinite;
+        }
+        .paused-spin {
+            animation-play-state: paused;
+        }
+
         @keyframes slideIn {
             from { transform: translateY(100%); opacity: 0; }
             to { transform: translateY(0); opacity: 1; }
@@ -108,7 +120,7 @@ def serve_galaxy_gear_app():
         .animate-toast { animation: slideIn 0.3s ease-out forwards; }
     </style>
 </head>
-<body class="font-sans text-gray-100 antialiased min-h-screen flex flex-col relative selection:bg-purple-500 selection:text-white pb-28">
+<body class="font-sans text-gray-100 antialiased min-h-screen flex flex-col relative selection:bg-purple-500 selection:text-white pb-32">
 
     <!-- Header / Navbar -->
     <header class="glass-nav text-white p-4 sticky top-0 z-30 shadow-2xl">
@@ -138,7 +150,7 @@ def serve_galaxy_gear_app():
                         </span>
                         <span id="user-display-name" class="font-bold text-purple-300 text-xs"></span>
                         <button onclick="deleteAccountPrompt()" class="bg-red-500/20 hover:bg-red-500 text-red-300 hover:text-white px-2 py-1 rounded-lg text-xs font-semibold transition border border-red-500/30">
-                            ลบแถบ
+                            ลบบัญชี
                         </button>
                         <button onclick="logout()" class="bg-gray-700/50 hover:bg-gray-600 text-gray-300 px-2 py-1 rounded-lg text-xs font-semibold transition">
                             ออก
@@ -245,27 +257,47 @@ def serve_galaxy_gear_app():
         <div id="product-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"></div>
     </main>
 
-    <!-- Floating Background Music Player Bar -->
-    <div class="fixed bottom-0 left-0 right-0 z-50 glass-nav border-t border-purple-500/30 p-3 px-6 flex items-center justify-between shadow-2xl">
-        <div class="flex items-center gap-3">
-            <button id="music-play-btn" onclick="toggleMusic()" class="w-10 h-10 rounded-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white flex items-center justify-center text-sm font-bold shadow-neon-purple transition active:scale-95">
-                <i id="music-icon" class="fa-solid fa-play ml-0.5"></i>
-            </button>
+    <!-- Floating Spinning CD Record Music Player -->
+    <div class="fixed bottom-0 left-0 right-0 z-50 glass-nav border-t border-purple-500/40 p-2.5 px-6 flex items-center justify-between shadow-2xl">
+        <div class="flex items-center gap-4">
+            <!-- CD Disc Record with Cover Art -->
+            <div onclick="toggleMusic()" class="relative w-12 h-12 rounded-full cursor-pointer group flex-shrink-0">
+                <div id="cd-disc" class="w-full h-full rounded-full border-2 border-purple-400/60 overflow-hidden shadow-neon-purple p-0.5 bg-black relative animate-spin-cd">
+                    <img src="https://img.youtube.com/vi/pP-0CzmxLE4/hqdefault.jpg" class="w-full h-full object-cover rounded-full">
+                    <!-- Inner Vinyl Hole -->
+                    <div class="absolute inset-0 m-auto w-3.5 h-3.5 rounded-full bg-slate-950 border border-purple-400/80 shadow-inner flex items-center justify-center">
+                        <div class="w-1.5 h-1.5 rounded-full bg-slate-900"></div>
+                    </div>
+                </div>
+                <!-- Play/Pause Overlay Icon -->
+                <div class="absolute inset-0 bg-black/40 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition">
+                    <i id="cd-hover-icon" class="fa-solid fa-pause text-white text-xs"></i>
+                </div>
+            </div>
+
             <div>
                 <div class="flex items-center gap-2">
                     <span class="text-xs font-bold text-purple-300">Real J - “ ศีลแตก ” (Feat. FLAMELIGHT & XANICBOY$ )</span>
-                    <span class="text-[10px] bg-red-900/60 text-red-300 px-2 py-0.5 rounded-full border border-red-500/30">YouTube Music</span>
+                    <span class="text-[9px] bg-purple-950/80 text-purple-300 px-2 py-0.5 rounded-full border border-purple-500/30 font-mono">🔊 Vol: 15%</span>
                 </div>
-                <p id="music-status" class="text-[10px] text-gray-400">กดปุ่มเล่นเพื่อเปิดเพลงฟังในเว็บ</p>
+                <p id="music-status" class="text-[10px] text-emerald-400 font-mono">💿 CD Spinning & Playing...</p>
             </div>
         </div>
-        <a href="https://www.youtube.com/watch?v=pP-0CzmxLE4" target="_blank" class="text-xs text-purple-400 hover:text-purple-300 flex items-center gap-1 underline">
-            <i class="fa-brands fa-youtube text-red-500"></i> ดูบน YouTube
-        </a>
+
+        <div class="flex items-center gap-3">
+            <button id="music-play-btn" onclick="toggleMusic()" class="bg-purple-600/80 hover:bg-purple-500 text-white px-3.5 py-1.5 rounded-xl text-xs font-bold border border-purple-400/40 transition active:scale-95 shadow-neon-purple flex items-center gap-1.5">
+                <i id="music-icon" class="fa-solid fa-pause"></i>
+                <span id="music-btn-text">พักเพลง</span>
+            </button>
+            <a href="https://www.youtube.com/watch?v=pP-0CzmxLE4" target="_blank" class="hidden sm:flex text-xs text-purple-400 hover:text-purple-300 items-center gap-1 underline">
+                <i class="fa-brands fa-youtube text-red-500"></i> YouTube
+            </a>
+        </div>
     </div>
 
-    <!-- Hidden YouTube Audio Player -->
-    <iframe id="yt-player" class="hidden" width="1" height="1" src="https://www.youtube.com/embed/pP-0CzmxLE4?enablejsapi=1" allow="autoplay"></iframe>
+    <!-- Hidden YouTube API IFrame Player (Configured for Autoplay & Low Volume) -->
+    <div id="player-container" class="hidden"></div>
+    <script src="https://www.youtube.com/iframe_api"></script>
 
     <div id="terminal-drawer" class="fixed bottom-16 left-0 right-0 z-40 transform translate-y-full transition-transform duration-300 ease-in-out">
         <div class="terminal-bg border-t-2 border-yellow-500/50 shadow-2xl rounded-t-2xl p-4 text-xs font-mono text-emerald-400 max-w-7xl mx-auto border-x border-white/10">
@@ -402,22 +434,67 @@ app = FastAPI(title=<span class="text-yellow-300">"Galaxy Gear API"</span>)
     <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2"></div>
 
     <script>
-        let isPlaying = false;
+        let ytPlayer;
+        let isMusicPlaying = true;
+
+        function onYouTubeIframeAPIReady() {
+            ytPlayer = new YT.Player('player-container', {
+                height: '1',
+                width: '1',
+                videoId: 'pP-0CzmxLE4',
+                playerVars: {
+                    'autoplay': 1,
+                    'controls': 0,
+                    'loop': 1,
+                    'playlist': 'pP-0CzmxLE4'
+                },
+                events: {
+                    'onReady': onPlayerReady
+                }
+            });
+        }
+
+        function onPlayerReady(event) {
+            // Set soft volume level suitable for single-user listening (15%)
+            event.target.setVolume(15);
+            event.target.playVideo();
+            updateMusicUI(true);
+        }
+
         function toggleMusic() {
-            const iframe = document.getElementById('yt-player');
+            if (!ytPlayer || typeof ytPlayer.playVideo !== 'function') return;
+            
+            if (isMusicPlaying) {
+                ytPlayer.pauseVideo();
+                updateMusicUI(false);
+            } else {
+                ytPlayer.playVideo();
+                updateMusicUI(true);
+            }
+        }
+
+        function updateMusicUI(playing) {
+            isMusicPlaying = playing;
+            const cd = document.getElementById('cd-disc');
             const icon = document.getElementById('music-icon');
+            const hoverIcon = document.getElementById('cd-hover-icon');
+            const btnText = document.getElementById('music-btn-text');
             const status = document.getElementById('music-status');
 
-            if (!isPlaying) {
-                iframe.src = "https://www.youtube.com/embed/pP-0CzmxLE4?autoplay=1&enablejsapi=1";
-                icon.className = "fa-solid fa-pause ml-0.5";
-                status.innerText = "กำลังเล่นเพลง...";
-                isPlaying = true;
+            if (playing) {
+                cd.classList.remove('paused-spin');
+                icon.className = 'fa-solid fa-pause';
+                hoverIcon.className = 'fa-solid fa-pause text-white text-xs';
+                btnText.innerText = 'พักเพลง';
+                status.innerText = '💿 CD Spinning & Playing...';
+                status.className = 'text-[10px] text-emerald-400 font-mono';
             } else {
-                iframe.src = "https://www.youtube.com/embed/pP-0CzmxLE4?enablejsapi=1";
-                icon.className = "fa-solid fa-play ml-0.5";
-                status.innerText = "หยุดเล่นเพลงแล้ว";
-                isPlaying = false;
+                cd.classList.add('paused-spin');
+                icon.className = 'fa-solid fa-play';
+                hoverIcon.className = 'fa-solid fa-play text-white text-xs';
+                btnText.innerText = 'เล่นเพลง';
+                status.innerText = '⏸️ CD Paused';
+                status.className = 'text-[10px] text-yellow-400 font-mono';
             }
         }
 
@@ -892,6 +969,14 @@ app = FastAPI(title=<span class="text-yellow-300">"Galaxy Gear API"</span>)
             updateAuthUI();
             updateCartCount();
             pyLog('/api/init', 'GET', 'Galaxy Gear Frontend Initialized and Connected to FastAPI Server');
+            
+            // First user interaction auto-play fallback for strict browser audio policies
+            document.body.addEventListener('click', () => {
+                if (ytPlayer && typeof ytPlayer.playVideo === 'function' && !isMusicPlaying) {
+                    ytPlayer.playVideo();
+                    updateMusicUI(true);
+                }
+            }, { once: true });
         };
     </script>
 </body>
